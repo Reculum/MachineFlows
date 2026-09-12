@@ -9,25 +9,23 @@ import java.util.Iterator;
 
 public class Machine {
 
+    protected Integer id;
+
     //std input/output flow amounts of what materials. As a mapping.
-    private Map<Material, Float> inputAmounts;
-    private Map<Material, Float> outputAmounts;
+    protected Map<Material, Float> inputAmounts;
+    protected Map<Material, Float> outputAmounts;
 
     //what materials are taken as input and what are outputted.
-    private ArrayList<Material> inputMaterials;
-    private ArrayList<Material> outputMaterials;
+    protected ArrayList<Material> inputMaterials;
+    protected ArrayList<Material> outputMaterials;
 
     //a mapping representing what material is piped (or received) by what other machine
-    private Map<Material, Machine> outMaterialToMachine;
-    private Map<Material, Machine> inMaterialToMachine;
-
-    //two lists: one of the machines supplying the input materials
-    //and the other of machines receiving the output materials
-    private LinkedList<Machine> inputMachines;
-    private LinkedList<Machine> outputMachines;
+    protected Map<Material, LinkedList<Machine>> outMaterialToMachine;
+    protected Map<Material, LinkedList<Machine>> inMaterialToMachine;
 
 
-    public Machine(ArrayList<Material> inputMaterials,
+    public Machine(Integer id,
+                   ArrayList<Material> inputMaterials,
                    ArrayList<Material> outputMaterials,
                    ArrayList<Float> stdInFlows,
                    ArrayList<Float> stdOutFlows) throws Exception{
@@ -39,6 +37,7 @@ public class Machine {
 
             }
 
+            this.id = id;
 
             //the input materials are declared
             this.inputMaterials = inputMaterials;
@@ -71,10 +70,31 @@ public class Machine {
                 Float nextOutFlow = OutFlowsIter.next();
                 (this.outputAmounts).put(nextOutMaterial, nextOutFlow);
                 
-            }
-            
+            }    
 
     }
+
+    public Integer getId(){
+        return this.id;
+    }
+
+    public Machine pipeMaterialTo(Material outMat, Machine outMach){
+
+        LinkedList<Machine> ThisMachine_OutputList = (this.outMaterialToMachine).get(outMat);
+        ThisMachine_OutputList.addLast(outMach);
+
+        LinkedList<Machine> ThatMachine_InputList = (outMach.inMaterialToMachine).get(outMat);
+        ThatMachine_InputList.addLast(this);
+
+        return outMach;
+    }
+
+    public Boolean isEqualTo(Machine that){
+        return (this.id == that.getId());
+    }
+
+
+
 
 
 
