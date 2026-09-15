@@ -17,8 +17,8 @@ public class Machine {
     protected Material[] MaterialList;
 
     //a mapping representing what material is piped (or received) by what other machine
-    protected Map<Material, LinkedList<Machine>> outMachinesByMaterial;
-    protected Map<Material, LinkedList<Machine>> inMachinesByMaterial;
+    protected Map<Material, LinkedList<Machine>> outMachinesByMaterial = new HashMap<Material, LinkedList<Machine>>();
+    protected Map<Material, LinkedList<Machine>> inMachinesByMaterial = new HashMap<Material, LinkedList<Machine>>();
 
 
     public Machine(Integer id,
@@ -54,7 +54,16 @@ public class Machine {
                 inputAmounts.put(nextMaterial, nextInFlow);
                 outputAmounts.put(nextMaterial, nextOutFlow);
 
-            }  
+            }
+            
+            for (int k = 0; k < L; k++){
+
+                Material nextMaterial = MaterialList[k];
+
+                outMachinesByMaterial.put(nextMaterial, new LinkedList<Machine>());
+                inMachinesByMaterial.put(nextMaterial, new LinkedList<Machine>());
+
+            }
 
     }
 

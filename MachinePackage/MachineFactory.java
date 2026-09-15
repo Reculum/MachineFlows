@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedList;
 import java.util.Iterator;
 
 public class MachineFactory{
@@ -14,8 +15,10 @@ public class MachineFactory{
     protected Machine[] MachineList;
     protected Material[] MaterialList;
 
-    protected Integer numMachines;
-    protected Integer numMaterials;
+    protected Integer nMachines;
+    protected Integer nMaterials;
+
+    protected String[] MachineNames;
     
     public MachineFactory(){};
 
@@ -70,8 +73,6 @@ public class MachineFactory{
         String[] Materials = MaterialLine.split("\t");
         Integer nMaterials = Materials.length;
 
-        MaterialList = new Material[nMaterials];
-
         for (int k = 0; k < nMaterials; k++){
 
             Material tempMaterial = new Material(Materials[k]);
@@ -83,7 +84,7 @@ public class MachineFactory{
     private void PipeMaterialBetweenMachines(Machine MachFrom, Machine MachTo, Material Mat) throws Exception{
 
         if ( !(MachFrom.outputAmounts.get(Mat) > 0) ){throw new Exception("This Machine cannot output that Material!");}
-        if ( !(MachFrom.inputAmounts.get(Mat) > 0) ){throw new Exception("That Machine cannot process this Material!");}
+        if ( !(MachTo.inputAmounts.get(Mat) > 0) ){throw new Exception("That Machine cannot process this Material!");}
 
         Iterator<Machine> MachFromIter = (MachFrom.outMachinesByMaterial.get(Mat)).iterator();
         Iterator<Machine> MachToIter = (MachTo.inMachinesByMaterial.get(Mat)).iterator();
@@ -111,14 +112,13 @@ public class MachineFactory{
 
     public void buildFactoryFromFile(String MachinePath, String PipePath){
 
-        //reading and couting elements, lines and machines
-        Integer nMachines;
-        Integer nMaterials;
-
         Integer nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
 
         nMachines = nMachnMat[0];
         nMaterials = nMachnMat[1];
+
+        MaterialList = new Material[nMaterials];
+        MachineList = new Machine[nMachines];
 
         //we will need to order and save important informations in array, in order to effeciently combine
         //them later on
@@ -130,7 +130,7 @@ public class MachineFactory{
         Map<String, Integer> FromMachineNameToId = new HashMap<String, Integer>(nMachines);
 
         //the inverse mapping of the one above
-        String[] MachineNames = new String[nMachines];
+        MachineNames = new String[nMachines];
 
         //each index will represent a Machine and will contain a list of the STANDARD input Material Flows to said machine
         Float[][] StdInputFlowsByMachine = new Float[nMachines][nMaterials];
@@ -147,8 +147,6 @@ public class MachineFactory{
         String line = "";
         String Flow = "";
 
-        Float[] StdFlows = new Float[nMaterials];
-
         try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){
             
             String FirstLine = br.readLine();
@@ -163,35 +161,33 @@ public class MachineFactory{
                 Name = NameModeFlows[0];
                 Mode = NameModeFlows[1];
 
+                if ( FromMachineNameToId.get(Name) == null ){
+                    FromMachineNameToId.put(Name, MachineId);
+                    MachineNames[MachineId] = Name;
+                }
+
                 for (int k = 2; k < NameModeFlows.length; k++){
 
                     Flow = NameModeFlows[k];
                     //cast it into Float
                     Float FlowFloat = Float.valueOf(Flow);
-                    StdFlows[k] = FlowFloat;
 
-                }    
+                    if (Mode.equals("in")){
+                        StdInputFlowsByMachine[FromMachineNameToId.get(Name)][k - 2] = FlowFloat;
+                    }
+                    if (Mode.equals("out")){
+                        StdOutputFlowsByMachine[FromMachineNameToId.get(Name)][k - 2] = FlowFloat;
+                    }
 
-            }
-
-                if (FromMachineNameToId.get(Name) == null){
-                    FromMachineNameToId.put(Name, MachineId);
-                    MachineNames[MachineId] = Name;
-                }
-
-                if (Mode == "in"){
-                    StdInputFlowsByMachine[FromMachineNameToId.get(Name)] = StdFlows;
-                }
-                else{
-                    StdOutputFlowsByMachine[FromMachineNameToId.get(Name)] = StdFlows;
                 }
 
                 MachineId += 1;
-            
-            br.close();
-        }catch (Exception e){
-            System.out.println("Error counting the lines of the Machine file.");
-        }
+
+            }
+
+        br.close();
+
+        } catch(Exception e) {System.out.println("Error counting the lines of the Machine file.");}
 
         //now, we build and associate the machines to their names
 
@@ -202,8 +198,11 @@ public class MachineFactory{
             Float[] outputFlows = StdOutputFlowsByMachine[k];
 
             try{
+
                 Machine tempMachine = new Machine(k, MaterialList, inputFlows, outputFlows);
                 FromMachineNameToMachine.put(Name, tempMachine);
+                MachineList[k] = tempMachine;
+
             }
             catch(Exception e){System.out.println("Error in the building of the Machine!");}
            
@@ -215,21 +214,25 @@ public class MachineFactory{
         String MachNameTo;
         String MatName;
 
-        try(BufferedReader br = new BufferedReader(new FileReader(PipePath))){             
+        try(BufferedReader br = new BufferedReader(new FileReader(PipePath))){    
+            
+            while ( (line = br.readLine()) != null){
 
-            line = br.readLine();
-            String[] FromToMat = line.split("\t");
+                String[] FromToMat = line.split("\t");
 
-            MachNameFrom = FromToMat[0];
-            MachNameTo = FromToMat[1];
-            MatName = FromToMat[2];
+                MachNameFrom = FromToMat[0];
+                MachNameTo = FromToMat[1];
+                MatName = FromToMat[2];
 
-            Machine MachFrom = FromMachineNameToMachine.get(MachNameFrom);
-            Machine MachTo = FromMachineNameToMachine.get(MachNameTo);
-            Material Mat = new Material(MatName);
+                Machine MachFrom = FromMachineNameToMachine.get(MachNameFrom);
+                Machine MachTo = FromMachineNameToMachine.get(MachNameTo);
+                Material Mat = new Material(MatName);
 
-            try{this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat);}
-            catch(Exception e){System.out.println("Error while piping a material from a machine!");}
+                try{this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat);}
+                catch(Exception e){System.out.println("Error while piping a material from a machine!");}
+
+            }
+            br.close();
         }
         catch (IOException e){
         System.out.println("Error while processing the Pipe file.");
@@ -237,5 +240,37 @@ public class MachineFactory{
 
     }
     
-    
+    @Override 
+    public String toString(){
+
+        String retString = "";
+
+        for (int MachineIdx = 0; MachineIdx < nMachines; MachineIdx++){
+
+            Machine tempMachine = MachineList[MachineIdx];
+            retString += MachineNames[MachineIdx] + "\n";
+
+            for (int MaterialIdx = 0; MaterialIdx < nMaterials; MaterialIdx++){
+
+                Material tempMaterial = MaterialList[MaterialIdx];
+                LinkedList<Machine> tempOutputMachines = tempMachine.outMachinesByMaterial.get(tempMaterial);
+                Iterator<Machine> OutMachineIter = tempOutputMachines.iterator();
+
+                while (OutMachineIter.hasNext()){
+                    Machine outMachine = OutMachineIter.next();
+
+                    retString += "|" + "\n";
+                    retString += "|" + "\n";
+                    retString += "|____" + "\t" + MachineNames[outMachine.getId()] + "\t" + tempMaterial.getName() + "\n";
+                }
+
+            }
+
+            retString += "\n";
+            retString += "\n";
+
+        }
+
+        return retString;
+    }
 }

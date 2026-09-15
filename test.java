@@ -8,7 +8,7 @@ public class test {
 		MachineFactory t = new MachineFactory();
 		t.buildFactoryFromFile("./machines.txt", "./plumbing.txt");
 
-		System.out.println("stop");
+		System.out.println(t.toString());
 				
 	}
 	
