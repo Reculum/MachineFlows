@@ -83,8 +83,8 @@ public class MachineFactory{
 
     private void PipeMaterialBetweenMachines(Machine MachFrom, Machine MachTo, Material Mat) throws Exception{
 
-        if ( !(MachFrom.outputAmounts.get(Mat) > 0) ){throw new Exception("This Machine cannot output that Material!");}
-        if ( !(MachTo.inputAmounts.get(Mat) > 0) ){throw new Exception("That Machine cannot process this Material!");}
+        if ( !(MachFrom.outputAmounts.get(Mat) > 0) ){throw new Exception(MachineNames[MachFrom.getId()] + " cannot output " + Mat.getName());}
+        if ( !(MachTo.inputAmounts.get(Mat) > 0) ){throw new Exception(MachineNames[MachTo.getId()] + " cannot process " + Mat.getName());}
 
         Iterator<Machine> MachFromIter = (MachFrom.outMachinesByMaterial.get(Mat)).iterator();
         Iterator<Machine> MachToIter = (MachTo.inMachinesByMaterial.get(Mat)).iterator();
@@ -188,7 +188,7 @@ public class MachineFactory{
 
         br.close();
 
-        } catch(Exception e) {System.out.println("Error counting the lines of the Machine file.");}
+        } catch(Exception e) {System.out.println("Error in reading the Machine Flows");}
 
         //now, we build and associate the machines to their names
 
@@ -205,7 +205,10 @@ public class MachineFactory{
                 MachineList[k] = tempMachine;
 
             }
-            catch(Exception e){System.out.println("Error in the building of the Machine!");}
+            catch(Exception e){
+                System.out.println("Error in the building of the Machine!");
+                System.out.println(e.getMessage());
+            }
            
         }
         
@@ -230,7 +233,10 @@ public class MachineFactory{
                 Material Mat = new Material(MatName);
 
                 try{this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat);}
-                catch(Exception e){System.out.println("Error while piping a material from a machine!");}
+                catch(Exception e){
+                    System.out.println("Error while piping a material from a machine!");
+                    System.out.println(e.getMessage());
+                }
 
             }
             br.close();

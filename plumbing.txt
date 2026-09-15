@@ -1,3 +1,4 @@
 m1	m2	beta
 m1	m2	gamma
 m2	m1	alpha
+m1	m3	gamma

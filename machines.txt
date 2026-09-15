@@ -1,5 +1,7 @@
-alpha	beta	gamma
-m1	in	1	0	0
-m1	out	0	2	2
-m2	in	0	1	2
-m2	out	1	0	0
+alpha	beta	gamma	delta
+m1	in	1	0	0	0	
+m1	out	0	2	2	0
+m2	in	0	1	2	0
+m2	out	1	0	0	0
+m3	in	0	0	1	0
+m3	out	0	0	0	1
