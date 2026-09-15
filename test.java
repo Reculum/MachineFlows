@@ -6,7 +6,7 @@ public class test {
 	public static void main(String[] args) {
 
 		MachineFactory t = new MachineFactory();
-		t.buildFactoryFromFile(args[0]);
+		t.buildFactoryFromFile("./machines.txt", "./connections.txt");
 				
 	}
 	

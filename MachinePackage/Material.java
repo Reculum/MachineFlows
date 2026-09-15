@@ -10,11 +10,24 @@ public class Material {
         name = textId;
     }
 
-    public Boolean isEqualTo(Material second){
-        return (second.getName() == this.name);
+    @Override
+    public boolean equals(Object other){
+
+        if (this == other){return true;}
+
+        if (other == null || getClass() != other.getClass()) return false;
+
+        Material altro = (Material) other;
+
+        return  (altro.getName().equals(name));
     }
 
-    public String getName(){return this.name;}
+    @Override
+    public int hashCode(){
+        return name.hashCode();
+    }
+
+    public String getName(){return name;}
     
     
 }

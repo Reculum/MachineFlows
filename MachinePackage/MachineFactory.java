@@ -2,31 +2,314 @@ package MachinePackage;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
 
 public class MachineFactory{
 
-    ArrayList<Machine> MachineList;
-    ArrayList<Material> MaterialList;
+    protected ArrayList<Machine> MachineList;
+    protected ArrayList<Material> MaterialList;
 
-    Integer numMachines;
-    Integer numMaterials;
+    protected Integer numMachines;
+    protected Integer numMaterials;
     
     public MachineFactory(){};
 
-    public void buildFactoryFromFile(String FilePath){
+    private Integer[] ParseMachinelFileIntoTotalMachinesAndMaterials(String MachinePath){
 
-        try (BufferedReader br = new BufferedReader(new FileReader(FilePath))) {
+        Integer nMachines = 0;
+        Integer nMaterials = 0;
 
-            String line;
+        Integer lineWhileIter;
+        Character CurrentChar;
+        String line;
+        Integer LenLine;
 
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
+        try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){ 
+
+            //special treatment for the first line
+            line = br.readLine();
+            LenLine = line.length();
+
+            //read the first line and count the number of materials
+            for (int k = 0; k < LenLine; k++){
+                CurrentChar = line.charAt(k);                
+                if ( (CurrentChar == '\t') || (CurrentChar == '\n')){nMaterials += 1;}
             }
+
+            //now, read all the other lines until there are no more
+            while ( (line = br.readLine()) != null) {
+
+                LenLine = line.length();
+                lineWhileIter = 0;
+
+                //iterate over the line until you find the first tab character
+                while ((lineWhileIter < LenLine) && (line.charAt(lineWhileIter) != '\t')){
+                    lineWhileIter += 1;
+                }
+
+                //then, the character next to it, will tell you weather to count that line
+                //as representing a machine or not
+                if (line.charAt(lineWhileIter + 1) == 'o'){nMachines += 1;}
+            }
+            br.close();
         }catch (IOException e){
-        System.out.println("Error reading file.");
+        System.out.println("Error counting the Machines and Materials in the Machine file.");
+        }
+        
+        Integer Ret[] = {nMachines, nMaterials};
+        return Ret;
+    }
+
+    private void ParseMaterialLineIntoMaterialList(String MaterialLine){
+
+        Character CurrentChar;
+        Material tempMaterial;
+
+        //now we process the first line and associate a unique Id
+        //to each Material we've read, from left to right
+        Integer TabIndex = 0;
+        Integer LenLine = MaterialLine.length();
+        String MaterialString = "";
+
+        for (int k = 0; k < LenLine; k++){
+
+            CurrentChar = MaterialLine.charAt(k);
+            if ( (CurrentChar == '\t') || (CurrentChar == '\n') ){
+
+                tempMaterial = new Material(MaterialString);
+
+                MaterialList.set(TabIndex, tempMaterial);
+                MaterialString = "";
+                TabIndex += 1;
+            }
+            else{
+                MaterialString += CurrentChar;
+            }
+        }
+
+    }
+
+    private void PipeMaterialBetweenMachines(Machine MachFrom, Machine MachTo, Material Mat) throws Exception{
+
+        if ( !(MachFrom.outputAmounts.get(Mat) > 0) ){throw new Exception("This Machine cannot output that Material!");}
+        if ( !(MachFrom.inputAmounts.get(Mat) > 0) ){throw new Exception("That Machine cannot process this Material!");}
+
+        Iterator<Machine> MachFromIter = (MachFrom.outMachinesByMaterial.get(Mat)).iterator();
+        Iterator<Machine> MachToIter = (MachTo.inMachinesByMaterial.get(Mat)).iterator();
+
+        Boolean MachToWasAlreadyThere = false;
+        Boolean MachFromWasAlreadyThere = false;
+
+        while (MachFromIter.hasNext()){
+
+            Machine nextMach = MachFromIter.next();
+            if (nextMach.equals(MachTo)){MachToWasAlreadyThere = true;}
+
+        }
+
+        while (MachToIter.hasNext()){
+
+            Machine nextMach = MachToIter.next();
+            if (nextMach.equals(MachFrom)){MachFromWasAlreadyThere = true;}
+        }
+
+        if (!MachFromWasAlreadyThere){MachTo.inMachinesByMaterial.get(Mat).addLast(MachFrom);}
+        if (!MachToWasAlreadyThere){MachFrom.outMachinesByMaterial.get(Mat).addLast(MachTo);}
+
+    }
+
+    public void buildFactoryFromFile(String MachinePath, String PipePath){
+
+        //reading and couting elements, lines and machines
+        Integer nMachines;
+        Integer nMaterials;
+
+        Integer nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
+
+        nMachines = nMachnMat[0];
+        nMaterials = nMachnMat[1];
+
+        //we will need to order and save important informations in array, in order to effeciently combine
+        //them later on
+
+        //takes as input the string found in the text and maps it to a Machine
+        Map<String, Machine> FromMachineNameToMachine = new HashMap<String, Machine>(nMachines);
+
+        //creates a mapping between the machine name and a unique machine id
+        Map<String, Integer> FromMachineNameToId = new HashMap<String, Integer>(nMachines);
+
+        //the inverse mapping of the one above
+        ArrayList<String> MachineNames = new ArrayList<String>(nMachines);
+
+        //each index will represent a Machine and will contain a list of the STANDARD input Material Flows to said machine
+        ArrayList<ArrayList<Float>> StdInputFlowsByMachine = new ArrayList<ArrayList<Float>>(nMachines);
+
+        //each index will represent a Machine and will contain a list of the STANDARD output Material Flows from said machine
+        ArrayList<ArrayList<Float>> StdOutputFlowsByMachine = new ArrayList<ArrayList<Float>>(nMachines);
+
+        //initializing useful variables
+
+        Integer MachineId = 0;
+        Integer TabIndex = 0;
+        Integer LenLine;
+        Character CurrentChar;
+
+
+        String Name;
+        String Mode;
+        String line;
+        String Flow;
+
+        ArrayList<Float> StdFlows = new ArrayList<Float>(nMaterials);
+
+        try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){
+            
+            String FirstLine = br.readLine();
+            this.ParseMaterialLineIntoMaterialList(FirstLine);
+
+            //now, we proceed reading the remaining lines
+
+            while ( (line = br.readLine()) != null) {
+
+                LenLine = line.length();
+                TabIndex = 0;
+                Name = "";
+                Mode = "";               
+
+                int k = 0;
+                int j = 0;
+
+                //iterate over the characters until the third Tab Character is found
+
+                for (k = 0; (k < LenLine) && (TabIndex <= 2); k++){
+                    CurrentChar = line.charAt(k);
+                    if (CurrentChar == '\t'){
+                        TabIndex += 1;
+                    }
+                    //all those found before the FIRST Tab Character represent the Name of the Machine
+                    if(TabIndex == 0){
+                        Name += CurrentChar;
+                    }
+                    //all those found before the SECOND Tab Character represent the Mode of the Machine (input or output)
+                    if(TabIndex == 1){
+                        Mode += CurrentChar;
+                    }
+                }
+
+                //we reset the TabIndex
+                TabIndex = 0;
+                Flow = "";
+
+                //we iterate over the rest of the line
+
+                for (j = k + 1; (j < LenLine); j++){
+
+                    CurrentChar = line.charAt(k);
+
+                    //every time a tab character is found...
+                    if (CurrentChar == '\t' || CurrentChar == '\n'){
+
+                        //cast it into Float
+                        Float FlowFloat = Float.valueOf(Flow);
+
+                        StdFlows.set(TabIndex, FlowFloat);                        
+                        TabIndex += 1;
+                    }
+                    else{
+                        Flow += CurrentChar;
+                    }      
+
+                }
+
+                if (FromMachineNameToId.get(Name) == null){
+                    FromMachineNameToId.put(Name, MachineId);
+                    MachineNames.set(MachineId, Name);
+                }
+
+                if (Mode == "in"){
+                    StdInputFlowsByMachine.set(FromMachineNameToId.get(Name), StdFlows);
+                }
+                else{
+                    StdOutputFlowsByMachine.set(FromMachineNameToId.get(Name), StdFlows);
+                }
+
+                MachineId += 1;
+
+            }
+            br.close();
+
+        }catch (IOException e){
+        System.out.println("Error counting the lines of the Machine file.");
+        }
+
+        //now, we build and associate the machines to their names
+
+        for (int k = 0; k < nMachines; k++){
+
+            Name = MachineNames.get(k);
+            ArrayList<Float> inputFlows = StdInputFlowsByMachine.get(k);
+            ArrayList<Float> outputFlows = StdOutputFlowsByMachine.get(k);
+
+            try{
+                Machine tempMachine = new Machine(k, MaterialList, inputFlows, outputFlows);
+                FromMachineNameToMachine.put(Name, tempMachine);
+            }
+            catch(Exception e){System.out.println("Error in the building of the Machine!");}
+           
+        }
+        
+        //finally, we read where we must pipe what material to what machine
+
+        String MachNameFrom;
+        String MachNameTo;
+        String MatName;
+
+        try(BufferedReader br = new BufferedReader(new FileReader(PipePath))){             
+
+            line = br.readLine();
+            LenLine = line.length();
+            TabIndex = 0;
+
+            MachNameFrom = "";
+            MachNameTo = "";
+            MatName = "";
+
+            for (int k = 0; k < LenLine; k++){                
+
+                CurrentChar = line.charAt(k);
+
+                if (CurrentChar == '\t' || CurrentChar == '\n'){
+                    TabIndex += 1;
+                }
+
+                if (TabIndex == 0){
+                    MachNameFrom += CurrentChar;
+                }
+
+                if (TabIndex == 1){
+                    MachNameTo += CurrentChar;
+                }
+
+                if (TabIndex == 2){
+                    MatName += CurrentChar;
+                }
+            }
+
+            Machine MachFrom = FromMachineNameToMachine.get(MachNameFrom);
+            Machine MachTo = FromMachineNameToMachine.get(MachNameTo);
+            Material Mat = new Material(MatName);
+
+            try{this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat);}
+            catch(Exception e){System.out.println("Error while piping a material from a machine!");}
+        }
+        catch (IOException e){
+        System.out.println("Error while processing the Pipe file.");
         }
 
     }

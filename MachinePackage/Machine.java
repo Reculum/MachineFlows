@@ -15,23 +15,21 @@ public class Machine {
     protected Map<Material, Float> inputAmounts;
     protected Map<Material, Float> outputAmounts;
 
-    //what materials are taken as input and what are outputted.
-    protected ArrayList<Material> inputMaterials;
-    protected ArrayList<Material> outputMaterials;
+    //what materials are taken as input and outputted by the machine
+    protected ArrayList<Material> MaterialList;
 
     //a mapping representing what material is piped (or received) by what other machine
-    protected Map<Material, LinkedList<Machine>> outMaterialToMachine;
-    protected Map<Material, LinkedList<Machine>> inMaterialToMachine;
+    protected Map<Material, LinkedList<Machine>> outMachinesByMaterial;
+    protected Map<Material, LinkedList<Machine>> inMachinesByMaterial;
 
 
     public Machine(Integer id,
-                   ArrayList<Material> inputMaterials,
-                   ArrayList<Material> outputMaterials,
+                   ArrayList<Material> MaterialList,
                    ArrayList<Float> stdInFlows,
                    ArrayList<Float> stdOutFlows) throws Exception{
 
-            if ( (inputMaterials.size() != stdInFlows.size()) ||
-               ((outputMaterials.size() != stdOutFlows.size())) ){
+            if ( (MaterialList.size() != stdInFlows.size()) ||
+               ((MaterialList.size() != stdOutFlows.size())) ){
 
                 throw new Exception("Error: Mismatch between Materials and Flows!!!");
 
@@ -40,65 +38,54 @@ public class Machine {
             this.id = id;
 
             //the input materials are declared
-            this.inputMaterials = inputMaterials;
-            this.outputMaterials = outputMaterials;
+            this.MaterialList = MaterialList;
 
             //intialize the two mappings
             this.inputAmounts = new HashMap<Material, Float>();
             this.outputAmounts = new HashMap<Material, Float>();
 
             //we will iterate over the input and output materials...
-            Iterator<Material> inputMatIter = inputMaterials.iterator();
-            Iterator<Material> outputMatIter = outputMaterials.iterator();
-            
+            Iterator<Material> MaterialIter = MaterialList.iterator();
+
             //and the corresponding amounts
             Iterator<Float> InFlowsIter = stdInFlows.iterator();
             Iterator<Float> OutFlowsIter = stdOutFlows.iterator();            
 
 
-            while (inputMatIter.next() != null){
+            while (MaterialIter.next() != null){
                 
-                Material nextInMaterial = inputMatIter.next();
+                Material nextMaterial = MaterialIter.next();
+
                 Float nextInFlow = InFlowsIter.next();
-                (this.inputAmounts).put(nextInMaterial, nextInFlow);
-
-            }
-
-            while (outputMatIter.next() != null){
-                
-                Material nextOutMaterial = outputMatIter.next();
                 Float nextOutFlow = OutFlowsIter.next();
-                (this.outputAmounts).put(nextOutMaterial, nextOutFlow);
-                
-            }    
+
+                inputAmounts.put(nextMaterial, nextInFlow);
+                outputAmounts.put(nextMaterial, nextOutFlow);
+
+            }  
 
     }
 
     public Integer getId(){
-        return this.id;
+        return id;
     }
 
-    public Machine pipeMaterialTo(Material outMat, Machine outMach){
+    @Override
+    public boolean equals(Object other){
 
-        LinkedList<Machine> ThisMachine_OutputList = (this.outMaterialToMachine).get(outMat);
-        ThisMachine_OutputList.addLast(outMach);
+        if (this == other){return true;}
 
-        LinkedList<Machine> ThatMachine_InputList = (outMach.inMaterialToMachine).get(outMat);
-        ThatMachine_InputList.addLast(this);
+        if (other == null || getClass() != other.getClass()) return false;
 
-        return outMach;
+        Machine altro = (Machine) other;
+
+        return  (altro.getId().equals(id));
     }
 
-    public Boolean isEqualTo(Machine that){
-        return (this.id == that.getId());
+    @Override 
+    public int hashCode(){
+        return id;
     }
-
-
-
-
-
-
-
 
     
 }
