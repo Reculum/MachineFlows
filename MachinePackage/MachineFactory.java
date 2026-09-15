@@ -5,15 +5,14 @@ import java.io.FileReader;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
 public class MachineFactory{
 
-    protected ArrayList<Machine> MachineList;
-    protected ArrayList<Material> MaterialList;
+    protected Machine[] MachineList;
+    protected Material[] MaterialList;
 
     protected Integer numMachines;
     protected Integer numMaterials;
@@ -39,7 +38,7 @@ public class MachineFactory{
             //read the first line and count the number of materials
             for (int k = 0; k < LenLine; k++){
                 CurrentChar = line.charAt(k);                
-                if ( (CurrentChar == '\t') || (CurrentChar == '\n')){nMaterials += 1;}
+                if ( (CurrentChar == '\t') || (k + 1 == LenLine)){nMaterials += 1;}
             }
 
             //now, read all the other lines until there are no more
@@ -68,31 +67,17 @@ public class MachineFactory{
 
     private void ParseMaterialLineIntoMaterialList(String MaterialLine){
 
-        Character CurrentChar;
-        Material tempMaterial;
+        String[] Materials = MaterialLine.split("\t");
+        Integer nMaterials = Materials.length;
 
-        //now we process the first line and associate a unique Id
-        //to each Material we've read, from left to right
-        Integer TabIndex = 0;
-        Integer LenLine = MaterialLine.length();
-        String MaterialString = "";
+        MaterialList = new Material[nMaterials];
 
-        for (int k = 0; k < LenLine; k++){
+        for (int k = 0; k < nMaterials; k++){
 
-            CurrentChar = MaterialLine.charAt(k);
-            if ( (CurrentChar == '\t') || (CurrentChar == '\n') ){
+            Material tempMaterial = new Material(Materials[k]);
+            MaterialList[k] = tempMaterial;
 
-                tempMaterial = new Material(MaterialString);
-
-                MaterialList.set(TabIndex, tempMaterial);
-                MaterialString = "";
-                TabIndex += 1;
-            }
-            else{
-                MaterialString += CurrentChar;
-            }
         }
-
     }
 
     private void PipeMaterialBetweenMachines(Machine MachFrom, Machine MachTo, Material Mat) throws Exception{
@@ -145,28 +130,24 @@ public class MachineFactory{
         Map<String, Integer> FromMachineNameToId = new HashMap<String, Integer>(nMachines);
 
         //the inverse mapping of the one above
-        ArrayList<String> MachineNames = new ArrayList<String>(nMachines);
+        String[] MachineNames = new String[nMachines];
 
         //each index will represent a Machine and will contain a list of the STANDARD input Material Flows to said machine
-        ArrayList<ArrayList<Float>> StdInputFlowsByMachine = new ArrayList<ArrayList<Float>>(nMachines);
+        Float[][] StdInputFlowsByMachine = new Float[nMachines][nMaterials];
 
         //each index will represent a Machine and will contain a list of the STANDARD output Material Flows from said machine
-        ArrayList<ArrayList<Float>> StdOutputFlowsByMachine = new ArrayList<ArrayList<Float>>(nMachines);
+        Float[][] StdOutputFlowsByMachine = new Float[nMachines][nMaterials];
 
         //initializing useful variables
 
         Integer MachineId = 0;
-        Integer TabIndex = 0;
-        Integer LenLine;
-        Character CurrentChar;
 
+        String Name = "";
+        String Mode = "";
+        String line = "";
+        String Flow = "";
 
-        String Name;
-        String Mode;
-        String line;
-        String Flow;
-
-        ArrayList<Float> StdFlows = new ArrayList<Float>(nMaterials);
+        Float[] StdFlows = new Float[nMaterials];
 
         try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){
             
@@ -177,84 +158,48 @@ public class MachineFactory{
 
             while ( (line = br.readLine()) != null) {
 
-                LenLine = line.length();
-                TabIndex = 0;
-                Name = "";
-                Mode = "";               
+                String[] NameModeFlows = line.split("\t");
 
-                int k = 0;
-                int j = 0;
+                Name = NameModeFlows[0];
+                Mode = NameModeFlows[1];
 
-                //iterate over the characters until the third Tab Character is found
+                for (int k = 2; k < NameModeFlows.length; k++){
 
-                for (k = 0; (k < LenLine) && (TabIndex <= 2); k++){
-                    CurrentChar = line.charAt(k);
-                    if (CurrentChar == '\t'){
-                        TabIndex += 1;
-                    }
-                    //all those found before the FIRST Tab Character represent the Name of the Machine
-                    if(TabIndex == 0){
-                        Name += CurrentChar;
-                    }
-                    //all those found before the SECOND Tab Character represent the Mode of the Machine (input or output)
-                    if(TabIndex == 1){
-                        Mode += CurrentChar;
-                    }
-                }
+                    Flow = NameModeFlows[k];
+                    //cast it into Float
+                    Float FlowFloat = Float.valueOf(Flow);
+                    StdFlows[k] = FlowFloat;
 
-                //we reset the TabIndex
-                TabIndex = 0;
-                Flow = "";
+                }    
 
-                //we iterate over the rest of the line
-
-                for (j = k + 1; (j < LenLine); j++){
-
-                    CurrentChar = line.charAt(k);
-
-                    //every time a tab character is found...
-                    if (CurrentChar == '\t' || CurrentChar == '\n'){
-
-                        //cast it into Float
-                        Float FlowFloat = Float.valueOf(Flow);
-
-                        StdFlows.set(TabIndex, FlowFloat);                        
-                        TabIndex += 1;
-                    }
-                    else{
-                        Flow += CurrentChar;
-                    }      
-
-                }
+            }
 
                 if (FromMachineNameToId.get(Name) == null){
                     FromMachineNameToId.put(Name, MachineId);
-                    MachineNames.set(MachineId, Name);
+                    MachineNames[MachineId] = Name;
                 }
 
                 if (Mode == "in"){
-                    StdInputFlowsByMachine.set(FromMachineNameToId.get(Name), StdFlows);
+                    StdInputFlowsByMachine[FromMachineNameToId.get(Name)] = StdFlows;
                 }
                 else{
-                    StdOutputFlowsByMachine.set(FromMachineNameToId.get(Name), StdFlows);
+                    StdOutputFlowsByMachine[FromMachineNameToId.get(Name)] = StdFlows;
                 }
 
                 MachineId += 1;
-
-            }
+            
             br.close();
-
-        }catch (IOException e){
-        System.out.println("Error counting the lines of the Machine file.");
+        }catch (Exception e){
+            System.out.println("Error counting the lines of the Machine file.");
         }
 
         //now, we build and associate the machines to their names
 
         for (int k = 0; k < nMachines; k++){
 
-            Name = MachineNames.get(k);
-            ArrayList<Float> inputFlows = StdInputFlowsByMachine.get(k);
-            ArrayList<Float> outputFlows = StdOutputFlowsByMachine.get(k);
+            Name = MachineNames[k];
+            Float[] inputFlows = StdInputFlowsByMachine[k];
+            Float[] outputFlows = StdOutputFlowsByMachine[k];
 
             try{
                 Machine tempMachine = new Machine(k, MaterialList, inputFlows, outputFlows);
@@ -273,33 +218,11 @@ public class MachineFactory{
         try(BufferedReader br = new BufferedReader(new FileReader(PipePath))){             
 
             line = br.readLine();
-            LenLine = line.length();
-            TabIndex = 0;
+            String[] FromToMat = line.split("\t");
 
-            MachNameFrom = "";
-            MachNameTo = "";
-            MatName = "";
-
-            for (int k = 0; k < LenLine; k++){                
-
-                CurrentChar = line.charAt(k);
-
-                if (CurrentChar == '\t' || CurrentChar == '\n'){
-                    TabIndex += 1;
-                }
-
-                if (TabIndex == 0){
-                    MachNameFrom += CurrentChar;
-                }
-
-                if (TabIndex == 1){
-                    MachNameTo += CurrentChar;
-                }
-
-                if (TabIndex == 2){
-                    MatName += CurrentChar;
-                }
-            }
+            MachNameFrom = FromToMat[0];
+            MachNameTo = FromToMat[1];
+            MatName = FromToMat[2];
 
             Machine MachFrom = FromMachineNameToMachine.get(MachNameFrom);
             Machine MachTo = FromMachineNameToMachine.get(MachNameTo);

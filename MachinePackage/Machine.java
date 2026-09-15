@@ -3,9 +3,7 @@ package MachinePackage;
 
 import java.util.Map;
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class Machine {
 
@@ -16,7 +14,7 @@ public class Machine {
     protected Map<Material, Float> outputAmounts;
 
     //what materials are taken as input and outputted by the machine
-    protected ArrayList<Material> MaterialList;
+    protected Material[] MaterialList;
 
     //a mapping representing what material is piped (or received) by what other machine
     protected Map<Material, LinkedList<Machine>> outMachinesByMaterial;
@@ -24,12 +22,12 @@ public class Machine {
 
 
     public Machine(Integer id,
-                   ArrayList<Material> MaterialList,
-                   ArrayList<Float> stdInFlows,
-                   ArrayList<Float> stdOutFlows) throws Exception{
+                   Material[] MaterialList,
+                   Float[] stdInFlows,
+                   Float[] stdOutFlows) throws Exception{
 
-            if ( (MaterialList.size() != stdInFlows.size()) ||
-               ((MaterialList.size() != stdOutFlows.size())) ){
+            if ( (MaterialList.length != stdInFlows.length) ||
+               ((MaterialList.length != stdOutFlows.length)) ){
 
                 throw new Exception("Error: Mismatch between Materials and Flows!!!");
 
@@ -43,21 +41,15 @@ public class Machine {
             //intialize the two mappings
             this.inputAmounts = new HashMap<Material, Float>();
             this.outputAmounts = new HashMap<Material, Float>();
+            
+            Integer L = MaterialList.length;
 
-            //we will iterate over the input and output materials...
-            Iterator<Material> MaterialIter = MaterialList.iterator();
-
-            //and the corresponding amounts
-            Iterator<Float> InFlowsIter = stdInFlows.iterator();
-            Iterator<Float> OutFlowsIter = stdOutFlows.iterator();            
-
-
-            while (MaterialIter.next() != null){
+            for (int k = 0; k < L; k ++){
                 
-                Material nextMaterial = MaterialIter.next();
+                Material nextMaterial = MaterialList[k];
 
-                Float nextInFlow = InFlowsIter.next();
-                Float nextOutFlow = OutFlowsIter.next();
+                Float nextInFlow = stdInFlows[k];
+                Float nextOutFlow = stdOutFlows[k];
 
                 inputAmounts.put(nextMaterial, nextInFlow);
                 outputAmounts.put(nextMaterial, nextOutFlow);
