@@ -152,7 +152,7 @@ public class MachineFactory{
             String FirstLine = br.readLine();
             this.ParseMaterialLineIntoMaterialList(FirstLine);
 
-            //now, we proceed reading the remaining lines
+            //now we read the remaining lines
 
             while ( (line = br.readLine()) != null) {
 
@@ -162,8 +162,11 @@ public class MachineFactory{
                 Mode = NameModeFlows[1];
 
                 if ( FromMachineNameToId.get(Name) == null ){
+
                     FromMachineNameToId.put(Name, MachineId);
                     MachineNames[MachineId] = Name;
+                    MachineId += 1;
+
                 }
 
                 for (int k = 2; k < NameModeFlows.length; k++){
@@ -180,8 +183,6 @@ public class MachineFactory{
                     }
 
                 }
-
-                MachineId += 1;
 
             }
 
