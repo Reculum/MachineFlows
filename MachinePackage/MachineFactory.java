@@ -110,6 +110,13 @@ public class MachineFactory{
 
     }
 
+    public Integer getNumMachines(){return nMachines;}
+    public Integer getNumMaterials(){return  nMaterials;}
+    public Machine[] getMachineList(){return MachineList;}
+    public Material[] getMaterialList(){return  MaterialList;}
+    public String[] getMachineNames(){return MachineNames;}
+
+
     public void buildFactoryFromFile(String MachinePath, String PipePath){
 
         Integer nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);

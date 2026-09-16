@@ -67,9 +67,13 @@ public class Machine {
 
     }
 
-    public Integer getId(){
-        return id;
-    }
+    public Integer getId(){return id;}
+    public Map<Material, Float> getInputAmounts(){return inputAmounts;}
+    public Map<Material, Float> getOutputAmounts(){return outputAmounts;}
+    public Material[] getMaterialList(){return MaterialList;}
+    public Map<Material, LinkedList<Machine>> getOutMachinesByMaterial(){return outMachinesByMaterial;}
+    public Map<Material, LinkedList<Machine>> getInMachinesByMaterial(){return inMachinesByMaterial;}
+
 
     @Override
     public boolean equals(Object other){
