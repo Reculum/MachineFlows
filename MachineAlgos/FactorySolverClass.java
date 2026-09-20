@@ -12,7 +12,7 @@ public class FactorySolverClass{
 
 	public FactorySolverClass(){}
 
-	private Machine[] LocateFactoryOutputs(MachineFactory Factory){
+	private static LinkedList<Machine> LocateFactoryOutputs(MachineFactory Factory){
 
 		int nMachines = Factory.getNumMachines();
 		int nMaterials = Factory.getNumMaterials();
@@ -20,7 +20,7 @@ public class FactorySolverClass{
 		Machine[] Machines = Factory.getMachineList();
 		Material[] Materials = Factory.getMaterialList();
 
-		Machine[] FactoryOutputs = new Machine[nMachines];
+		LinkedList<Machine> FactoryOutputs = new LinkedList<Machine>();
 
 		for (int k = 0; k < nMachines; k++){
 
@@ -37,7 +37,7 @@ public class FactorySolverClass{
 
 			}
 
-			if (outputtingToNoMachine){FactoryOutputs[k] = MachineK;}
+			if (outputtingToNoMachine){FactoryOutputs.addLast(MachineK);}
 
 		}
 
@@ -45,7 +45,7 @@ public class FactorySolverClass{
 
 	}
 
-	public int[] ComputeMinimalMachineConfig(MachineFactory Factory, Map<Material, Float> ProductionAmounts) throws Exception{
+	public static int[] ComputeMinimalMachineConfig(MachineFactory Factory, Map<Material, Float> ProductionAmounts){
 
 
 		//total number of machines
@@ -72,13 +72,14 @@ public class FactorySolverClass{
 		}
 
 		//we need to start from the output machines, since their amounts are quite easy
-		Machine[] OutputMachines = LocateFactoryOutputs(Factory);
+		LinkedList<Machine> OutputMachines = LocateFactoryOutputs(Factory);
+		Iterator<Machine> OutputMachinesIterator = OutputMachines.iterator();
 
-		for (int k = 0; k < OutputMachines.length; k++){
+		while (OutputMachinesIterator.hasNext()){
 
 			int MachineAmount = 0;
 
-			Machine OutMachine = OutputMachines[k];
+			Machine OutMachine = OutputMachinesIterator.next();
 			int OutMachineId = OutMachine.getId();
 
 			Map<Material, Float> OutputAmounts = OutMachine.getOutputAmounts();			
@@ -186,7 +187,8 @@ public class FactorySolverClass{
 					}
 
 					if (minimalProdRatio == Integer.MAX_VALUE){
-						throw new Exception("It is IMPOSSIBLE to satisfy this circuit!!!");
+						System.out.println("It is IMPOSSIBLE to satisfy this circuit!!!");
+						return new int[1];
 					}
 
 					//this is crucial: we need to add the minimalProdRatio, because we don't know
