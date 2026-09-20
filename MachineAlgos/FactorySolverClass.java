@@ -186,14 +186,19 @@ public class FactorySolverClass{
 
 					}
 
-					if (minimalProdRatio == Integer.MAX_VALUE){
+					if ( (minimalProdRatio == Integer.MAX_VALUE) && (inputMachinesForInMaterial.size() != 0)){
 						System.out.println("It is IMPOSSIBLE to satisfy this circuit!!!");
-						return new int[1];
+						int[] ret = {0};
+						return ret;
 					}
 
-					//this is crucial: we need to add the minimalProdRatio, because we don't know
-					//how many machines the minimal one is piping this material into
-					IntegerMachineAmountsByMaterial[k][minimalId] += minimalProdRatio; 
+					if (minimalProdRatio != Integer.MAX_VALUE){
+						//this is crucial: we need to add the minimalProdRatio, because we don't know
+						//how many machines the minimal one is piping this material into
+						IntegerMachineAmountsByMaterial[k][minimalId] += minimalProdRatio; 
+					}
+
+					
 
 				}
 			
