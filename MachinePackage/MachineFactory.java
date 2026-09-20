@@ -15,22 +15,22 @@ public class MachineFactory{
     protected Machine[] MachineList;
     protected Material[] MaterialList;
 
-    protected Integer nMachines;
-    protected Integer nMaterials;
+    protected int nMachines;
+    protected int nMaterials;
 
     protected String[] MachineNames;
     
     public MachineFactory(){};
 
-    private Integer[] ParseMachinelFileIntoTotalMachinesAndMaterials(String MachinePath){
+    private int[] ParseMachinelFileIntoTotalMachinesAndMaterials(String MachinePath){
 
-        Integer nMachines = 0;
-        Integer nMaterials = 0;
+        int nMachines = 0;
+        int nMaterials = 0;
 
-        Integer lineWhileIter;
-        Character CurrentChar;
+        int lineWhileIter;
+        char  CurrentChar;
         String line;
-        Integer LenLine;
+        int LenLine;
 
         try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){ 
 
@@ -64,14 +64,14 @@ public class MachineFactory{
         System.out.println("Error counting the Machines and Materials in the Machine file.");
         }
         
-        Integer Ret[] = {nMachines, nMaterials};
+        int Ret[] = {nMachines, nMaterials};
         return Ret;
     }
 
     private void ParseMaterialLineIntoMaterialList(String MaterialLine){
 
         String[] Materials = MaterialLine.split("\t");
-        Integer nMaterials = Materials.length;
+        int nMaterials = Materials.length;
 
         for (int k = 0; k < nMaterials; k++){
 
@@ -89,8 +89,8 @@ public class MachineFactory{
         Iterator<Machine> MachFromIter = (MachFrom.outMachinesByMaterial.get(Mat)).iterator();
         Iterator<Machine> MachToIter = (MachTo.inMachinesByMaterial.get(Mat)).iterator();
 
-        Boolean MachToWasAlreadyThere = false;
-        Boolean MachFromWasAlreadyThere = false;
+        boolean  MachToWasAlreadyThere = false;
+        boolean  MachFromWasAlreadyThere = false;
 
         while (MachFromIter.hasNext()){
 
@@ -110,8 +110,8 @@ public class MachineFactory{
 
     }
 
-    public Integer getNumMachines(){return nMachines;}
-    public Integer getNumMaterials(){return  nMaterials;}
+    public int getNumMachines(){return nMachines;}
+    public int getNumMaterials(){return  nMaterials;}
     public Machine[] getMachineList(){return MachineList;}
     public Material[] getMaterialList(){return  MaterialList;}
     public String[] getMachineNames(){return MachineNames;}
@@ -119,7 +119,7 @@ public class MachineFactory{
 
     public void buildFactoryFromFile(String MachinePath, String PipePath){
 
-        Integer nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
+        int nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
 
         nMachines = nMachnMat[0];
         nMaterials = nMachnMat[1];
@@ -140,14 +140,14 @@ public class MachineFactory{
         MachineNames = new String[nMachines];
 
         //each index will represent a Machine and will contain a list of the STANDARD input Material Flows to said machine
-        Float[][] StdInputFlowsByMachine = new Float[nMachines][nMaterials];
+        float [][] StdInputFlowsByMachine = new float [nMachines][nMaterials];
 
         //each index will represent a Machine and will contain a list of the STANDARD output Material Flows from said machine
-        Float[][] StdOutputFlowsByMachine = new Float[nMachines][nMaterials];
+        float [][] StdOutputFlowsByMachine = new float [nMachines][nMaterials];
 
         //initializing useful variables
 
-        Integer MachineId = 0;
+        int MachineId = 0;
 
         String Name = "";
         String Mode = "";
@@ -180,7 +180,7 @@ public class MachineFactory{
 
                     Flow = NameModeFlows[k];
                     //cast it into Float
-                    Float FlowFloat = Float.valueOf(Flow);
+                    float  FlowFloat = Float.valueOf(Flow);
 
                     if (Mode.equals("in")){
                         StdInputFlowsByMachine[FromMachineNameToId.get(Name)][k - 2] = FlowFloat;
@@ -202,8 +202,8 @@ public class MachineFactory{
         for (int k = 0; k < nMachines; k++){
 
             Name = MachineNames[k];
-            Float[] inputFlows = StdInputFlowsByMachine[k];
-            Float[] outputFlows = StdOutputFlowsByMachine[k];
+            float[] inputFlows = StdInputFlowsByMachine[k];
+            float[] outputFlows = StdOutputFlowsByMachine[k];
 
             try{
 

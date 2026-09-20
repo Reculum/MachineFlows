@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class Machine {
 
-    protected Integer id;
+    protected int id;
 
     //std input/output flow amounts of what materials. As a mapping.
     protected Map<Material, Float> inputAmounts;
@@ -21,10 +21,10 @@ public class Machine {
     protected Map<Material, LinkedList<Machine>> inMachinesByMaterial = new HashMap<Material, LinkedList<Machine>>();
 
 
-    public Machine(Integer id,
+    public Machine(int id,
                    Material[] MaterialList,
-                   Float[] stdInFlows,
-                   Float[] stdOutFlows) throws Exception{
+                   float[] stdInFlows,
+                   float[] stdOutFlows) throws Exception{
 
             if ( (MaterialList.length != stdInFlows.length) ||
                ((MaterialList.length != stdOutFlows.length)) ){
@@ -42,14 +42,14 @@ public class Machine {
             this.inputAmounts = new HashMap<Material, Float>();
             this.outputAmounts = new HashMap<Material, Float>();
             
-            Integer L = MaterialList.length;
+            int L = MaterialList.length;
 
             for (int k = 0; k < L; k ++){
                 
                 Material nextMaterial = MaterialList[k];
 
-                Float nextInFlow = stdInFlows[k];
-                Float nextOutFlow = stdOutFlows[k];
+                float nextInFlow = stdInFlows[k];
+                float nextOutFlow = stdOutFlows[k];
 
                 inputAmounts.put(nextMaterial, nextInFlow);
                 outputAmounts.put(nextMaterial, nextOutFlow);
@@ -67,7 +67,7 @@ public class Machine {
 
     }
 
-    public Integer getId(){return id;}
+    public int getId(){return id;}
     public Map<Material, Float> getInputAmounts(){return inputAmounts;}
     public Map<Material, Float> getOutputAmounts(){return outputAmounts;}
     public Material[] getMaterialList(){return MaterialList;}
@@ -84,7 +84,7 @@ public class Machine {
 
         Machine altro = (Machine) other;
 
-        return  (altro.getId().equals(id));
+        return  (altro.getId() == id);
     }
 
     @Override 

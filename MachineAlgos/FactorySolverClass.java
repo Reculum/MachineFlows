@@ -4,9 +4,9 @@ import MachinePackage.*;
 import java.util.LinkedList;
 
 
-public class FactoryMatrixClass{
+public class FactorySolverClass{
 
-	public FactoryMatrixClass(){}
+	public FactorySolverClass(){}
 
 	private Machine[] LocateFactoryOutputs(MachineFactory Factory){
 
@@ -31,7 +31,6 @@ public class FactoryMatrixClass{
 
 				outputtingToNoMachine = outputtingToNoMachine && (outMachinesMaterialJ.size() == 0);
 
-
 			}
 
 			if (outputtingToNoMachine){FactoryOutputs[k] = MachineK;}
@@ -42,6 +41,11 @@ public class FactoryMatrixClass{
 
 	}
 
-	//public static Float[][] ComputeFactoryMatrix(MachineFactory Factory){}
+	public int[] ComputeMinimalMachineConfig(MachineFactory Factory){
+
+		int nMachines = Factory.getNumMachines();
+		
+
+	}
 	
 }
