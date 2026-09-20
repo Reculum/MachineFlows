@@ -5,7 +5,6 @@ import MachinePackage.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.lang.Math;
 
 
@@ -149,9 +148,6 @@ public class FactorySolverClass{
 
 					while (inputMachinesIterator.hasNext()){
 
-						int inputMachineTotalAmount = 0;
-						int inputMachineMaterialAmount = 0;
-
 						Machine inputMachine = inputMachinesIterator.next();						
 						float MaterialOutputAmount = inputMachine.getOutputAmounts().get(inMaterial);
 
@@ -160,13 +156,16 @@ public class FactorySolverClass{
 						
 						if (MachineAlreadyVisited[inputMachine.getId()] == true){
 
+							int inputMachineTotalAmount = 0;
+							int inputMachineMaterialAmount = 0;
+
 							//we get how many machines are known to be needed for this material
 							inputMachineMaterialAmount = IntegerMachineAmountsByMaterial[k][inputMachine.getId()];
 							//and we also compute how many are known to be needed in general
 
-							for (int i = 0; k < nMaterials; k++){
-								if (IntegerMachineAmountsByMaterial[k][CurrentMachine.getId()] > inputMachineTotalAmount){
-									inputMachineTotalAmount = IntegerMachineAmountsByMaterial[k][CurrentMachine.getId()];
+							for (int i = 0; k < nMaterials; i++){
+								if (IntegerMachineAmountsByMaterial[i][inputMachine.getId()] > inputMachineTotalAmount){
+									inputMachineTotalAmount = IntegerMachineAmountsByMaterial[i][CurrentMachine.getId()];
 								}
 							}
 							
