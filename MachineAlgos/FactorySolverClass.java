@@ -115,7 +115,7 @@ public class FactorySolverClass{
 
 			Machine CurrentMachine = ExplorationQ.removeFirst();
 
-			if (MachineAlreadyVisited[CurrentMachine.getId()] = false){
+			if (MachineAlreadyVisited[CurrentMachine.getId()] == false){
 
 				//make sure no machine gets processed twice
 				MachineAlreadyVisited[CurrentMachine.getId()] = true;
