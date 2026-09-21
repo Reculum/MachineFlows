@@ -141,9 +141,12 @@ public class FactorySolverClass{
 					//we also should know, by now, an underestimate of the total input flow for this specific material
 					float TotInMaterialFlow = CurrentMachineAmountNeeded * MaterialInputAmount;
 
+					//now, given a material, we aim to find the optimal machine amongst the ones outputting it
 					int minimalProdRatio = Integer.MAX_VALUE;
 					int minimalId = 0;
-
+					Machine minimalMachine = null;
+					
+					//get a list of the appropriate machines
 					LinkedList<Machine> inputMachinesForInMaterial = inputMachinesByMaterial.get(inMaterial);
 					Iterator<Machine> inputMachinesIterator = inputMachinesForInMaterial.iterator();			
 
@@ -153,6 +156,9 @@ public class FactorySolverClass{
 						float MaterialOutputAmount = inputMachine.getOutputAmounts().get(inMaterial);
 
 						int IntegerRatio = (int) Math.ceil(TotInMaterialFlow / MaterialOutputAmount);
+
+						//this boolean will represent whether or not we can actually ask for
+						//more of this machine
 						boolean IsMachineCompatible = true;
 						
 						if (MachineAlreadyVisited[inputMachine.getId()] == true){
@@ -164,12 +170,14 @@ public class FactorySolverClass{
 							inputMachineMaterialAmount = IntegerMachineAmountsByMaterial[k][inputMachine.getId()];
 							//and we also compute how many are known to be needed in general
 
-							for (int i = 0; k < nMaterials; i++){
+							for (int i = 0; i < nMaterials; i++){
 								if (IntegerMachineAmountsByMaterial[i][inputMachine.getId()] > inputMachineTotalAmount){
-									inputMachineTotalAmount = IntegerMachineAmountsByMaterial[i][CurrentMachine.getId()];
+									inputMachineTotalAmount = IntegerMachineAmountsByMaterial[i][inputMachine.getId()];
 								}
 							}
 							
+							//if the amount we would be asking for is bounded by the amount that was already computed
+							//then, no inconsistencies will arise
 							if (!(inputMachineTotalAmount >= inputMachineMaterialAmount + IntegerRatio)){
 								IsMachineCompatible = false;
 							}
@@ -179,12 +187,13 @@ public class FactorySolverClass{
 
 							minimalProdRatio = IntegerRatio;
 							minimalId = inputMachine.getId();
-
+							minimalMachine = inputMachine;
 						}
-						
-						ExplorationQ.addLast(inputMachine);
 
 					}
+
+					//if at least on machine outputted this material, but none was compatible, then the circuit cannot
+					//be satisfied
 
 					if ( (minimalProdRatio == Integer.MAX_VALUE) && (inputMachinesForInMaterial.size() != 0)){
 						System.out.println("It is IMPOSSIBLE to satisfy this circuit!!!");
@@ -192,10 +201,19 @@ public class FactorySolverClass{
 						return ret;
 					}
 
+					//if the minimal productio ratio is not the highest possible integer, then
+					//we have found at least one compatible machine
+
 					if (minimalProdRatio != Integer.MAX_VALUE){
+
 						//this is crucial: we need to add the minimalProdRatio, because we don't know
 						//how many machines the minimal one is piping this material into
-						IntegerMachineAmountsByMaterial[k][minimalId] += minimalProdRatio; 
+						IntegerMachineAmountsByMaterial[k][minimalId] += minimalProdRatio;
+						
+						//this is also crucial: we have to absolutely avoid appending machines to the list
+						//before having determined that we need at least one of them. Basically, we are considering
+						//those that we need to satisfy the circuit in reverse-order from the Factory Output
+						ExplorationQ.addLast(minimalMachine); 
 					}
 
 					

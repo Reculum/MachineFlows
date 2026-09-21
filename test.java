@@ -9,16 +9,18 @@ public class test {
 
 	public static void main(String[] args) {
 
+		String path = "./examples/Factory-2/";
+
 		MachineFactory t = new MachineFactory();
-		t.buildFactoryFromFile("./machines.txt", "./plumbing.txt");
+		t.buildFactoryFromFile(path + "machines.txt", path + "plumbing.txt");
 
 		System.out.println(t.toString());
 
 		String[] MachineNames = t.getMachineNames();
 
 		Map<Material, Float> ProductionAmounts = new HashMap<Material, Float>();
-		Material deltaMaterial = new Material("delta");
-		ProductionAmounts.put(deltaMaterial, (float) 1.0);
+		Material epsMaterial = new Material("epsilon");
+		ProductionAmounts.put(epsMaterial, (float) 1.0);
 
 		int[] IntegerAmounts = FactorySolverClass.ComputeMinimalMachineConfig(t, ProductionAmounts);
 
