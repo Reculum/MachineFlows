@@ -1,9 +1,9 @@
 
 import MachinePackage.*;
 import MachineAlgos.*;
+import org.apache.commons.math3.optim.PointValuePair;
 
-import java.util.Map;
-import java.util.HashMap;
+
 
 public class test {
 
@@ -16,7 +16,10 @@ public class test {
 
 		System.out.println(t.toString());
 
-		float[][] matr = FactorySolverClass.ComputeConstraintsMatrix(t);
+		PointValuePair sol = FactorySolverClass.ComputeSelfSustainingFlow(t);
+
+		System.out.println(sol);
+
 				
 	}
 	

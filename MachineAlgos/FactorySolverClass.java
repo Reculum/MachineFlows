@@ -199,7 +199,7 @@ public class FactorySolverClass{
 		}
 
 		for (int k = 0; k < nFactoryOutputs; k++){
-			Constraints.add(new LinearConstraint(minimalOutputConstraints[k], Relationship.EQ, 0));
+			Constraints.add(new LinearConstraint(minimalOutputConstraints[k], Relationship.EQ, 1));
 		}
 
 		//now, we prepare the linear objective function
