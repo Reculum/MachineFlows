@@ -6,18 +6,53 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.lang.Math;
 
 
 public class FactorySolverClass{
 
 	public FactorySolverClass(){}
 
+	private static LinkedList<Machine> LocateFactoryOutputs(MachineFactory Factory){
+
+		int nMachines = Factory.getNumMachines();
+		int nMaterials = Factory.getNumMaterials();
+
+		Machine[] Machines = Factory.getMachineList();
+		Material[] Materials = Factory.getMaterialList();
+
+		LinkedList<Machine> FactoryOutputs = new LinkedList<Machine>();
+
+		for (int k = 0; k < nMachines; k++){
+
+			boolean outputtingToNoMachine = true;
+			Machine MachineK = Machines[k];
+
+			for (int j = 0; j < nMaterials; j++){
+
+				Material MaterialJ = Materials[j];				
+
+				LinkedList<Machine> outMachinesMaterialJ = (MachineK.getOutMachinesByMaterial()).get(MaterialJ);
+
+				outputtingToNoMachine = outputtingToNoMachine && (outMachinesMaterialJ.size() == 0);
+
+			}
+
+			if (outputtingToNoMachine){FactoryOutputs.addLast(MachineK);}
+
+		}
+
+		return FactoryOutputs;
+
+	}
+
 	public static float[][] ComputeConstraintsMatrix(MachineFactory f){
+
+		LinkedList<Machine> factoryOutputs = LocateFactoryOutputs(f);
 
 		int nMachines = f.getNumMachines();
 		int nMaterials = f.getNumMaterials();
 		int nPipes = f.getNumPipes();
+		int nFactoryOutputs = factoryOutputs.size();
 
 		Machine[] MachineList = f.getMachineList();
 		Material[] MaterialList = f.getMaterialList();
@@ -25,7 +60,7 @@ public class FactorySolverClass{
 
 		int nInputConsistency = 0;
 		int nOutputConsistency = 0;
-		boolean[][][] IsItZeroConstraint = new boolean[nMachines][nMaterials][2];
+		boolean[][][] IsNonZeroConstraint = new boolean[nMachines][nMaterials][2];
 
 		for (int j = 0; j < nMachines; j++){
 
@@ -33,18 +68,18 @@ public class FactorySolverClass{
 			Map<Material, Float> tempInputAmounts = tempMachine.getInputAmounts();
 			Map<Material, Float> tempOutputAmounts = tempMachine.getOutputAmounts();
 
-			for (int k = 0; k < nMachines; k++){
+			for (int k = 0; k < nMaterials; k++){
 
 				Material tempMaterial = MaterialList[k];
 
 				if (tempInputAmounts.get(tempMaterial) > 0){
 					nInputConsistency += 1;
-					IsItZeroConstraint[j][k][1] = false;
+					IsNonZeroConstraint[j][k][1] = true;
 				}
 
 				if (tempOutputAmounts.get(tempMaterial) > 0){
 					nOutputConsistency += 1;
-					IsItZeroConstraint[j][k][0] = false;
+					IsNonZeroConstraint[j][k][0] = true;
 				}
 
 			}
@@ -67,7 +102,7 @@ public class FactorySolverClass{
 
 			//input consistency condition, the machine receving the material is getting it in INPUT ==> 1 on the third field
 
-			if (!IsItZeroConstraint[machToId][matId][1]){
+			if (IsNonZeroConstraint[machToId][matId][1]){
 
 				float inputCoeff = machTo.getInputAmounts().get(matAcross);
 
@@ -77,7 +112,7 @@ public class FactorySolverClass{
 
 			//output consistency condition, the machine producing the material is OUTPUTTING it ==> 0 on the third field
 
-			if (!IsItZeroConstraint[machFromId][matId][0]){
+			if (IsNonZeroConstraint[machFromId][matId][0]){
 
 				float outputCoeff = machFrom.getOutputAmounts().get(matAcross);
 
@@ -89,7 +124,7 @@ public class FactorySolverClass{
 		int rowId = 0;
 		int slackVariableId = 0;
 
-		float[][] ConstraintsMatrix = new float[nInputConsistency + nOutputConsistency][nPipes + nMachines + nOutputConsistency];
+		float[][] ConstraintsMatrix = new float[nInputConsistency + nOutputConsistency + nFactoryOutputs][nPipes + nMachines + nOutputConsistency];
 
 		for (int i = 0; i < nMachines; i++){
 			for (int j = 0; j < nMaterials; j++){
@@ -97,7 +132,7 @@ public class FactorySolverClass{
 
 					//if the constraint is null, then there's none to be copied
 
-					if (!IsItZeroConstraint[i][j][k]){
+					if (IsNonZeroConstraint[i][j][k]){
 
 						for (int z = 0; z < nPipes + nMachines; z++){
 							ConstraintsMatrix[rowId][z] = ConstraintsTensor[i][j][k][z];
@@ -105,13 +140,24 @@ public class FactorySolverClass{
 
 						if (k == 0){
 							ConstraintsMatrix[rowId][nPipes + nMachines + slackVariableId] = 1;
+							slackVariableId += 1;
 						}
 
-						rowId += 1;
-						slackVariableId += 1;
+						rowId += 1;						
 					}
 				}
 			}
+		}
+
+		Iterator<Machine> factoryOutputIter = factoryOutputs.iterator();
+
+		while (factoryOutputIter.hasNext()){
+
+			Machine factoryOutputMachine = factoryOutputIter.next();
+			int FactoryOutputId = factoryOutputMachine.getId();
+
+			ConstraintsMatrix[rowId][nPipes + FactoryOutputId] = 1;
+			rowId += 1;
 		}
 
 		return ConstraintsMatrix;
