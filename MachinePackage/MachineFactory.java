@@ -21,6 +21,7 @@ public class MachineFactory{
     protected int nPipes;
 
     protected String[] MachineNames;
+    private Map<Material, Integer> FromMaterialToInt;
     
     public MachineFactory(){};
 
@@ -70,8 +71,9 @@ public class MachineFactory{
         return Ret;
     }
 
-    private void ParseMaterialLineIntoMaterialList(String MaterialLine){
+    private void ParseMaterialLine(String MaterialLine){
 
+        FromMaterialToInt = new HashMap<Material, Integer>();
         String[] Materials = MaterialLine.split("\t");
         int nMaterials = Materials.length;
 
@@ -79,6 +81,7 @@ public class MachineFactory{
 
             Material tempMaterial = new Material(Materials[k]);
             MaterialList[k] = tempMaterial;
+            FromMaterialToInt.put(tempMaterial, k);
 
         }
     }
@@ -118,6 +121,8 @@ public class MachineFactory{
     public Material[] getMaterialList(){return  MaterialList;}
     public Pipe[] getPipeList(){return  PipeList;}
     public String[] getMachineNames(){return MachineNames;}
+
+    public int GetMaterialId(Material mat){return FromMaterialToInt.get(mat);}
 
 
     public void buildFactoryFromFile(String MachinePath, String PipePath){
@@ -161,7 +166,7 @@ public class MachineFactory{
         try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){
             
             String FirstLine = br.readLine();
-            this.ParseMaterialLineIntoMaterialList(FirstLine);
+            this.ParseMaterialLine(FirstLine);
 
             //now we read the remaining lines
 
