@@ -150,10 +150,10 @@ public class MachineFactory{
         MachineNames = new String[nMachines];
 
         //each index will represent a Machine and will contain a list of the STANDARD input Material Flows to said machine
-        float [][] StdInputFlowsByMachine = new float [nMachines][nMaterials];
+        double [][] StdInputFlowsByMachine = new double [nMachines][nMaterials];
 
         //each index will represent a Machine and will contain a list of the STANDARD output Material Flows from said machine
-        float [][] StdOutputFlowsByMachine = new float [nMachines][nMaterials];
+        double [][] StdOutputFlowsByMachine = new double [nMachines][nMaterials];
 
         //initializing useful variables
 
@@ -190,7 +190,7 @@ public class MachineFactory{
 
                     Flow = NameModeFlows[k];
                     //cast it into Float
-                    float  FlowFloat = Float.valueOf(Flow);
+                    double  FlowFloat = Double.parseDouble(Flow);
 
                     if (Mode.equals("in")){
                         StdInputFlowsByMachine[FromMachineNameToId.get(Name)][k - 2] = FlowFloat;
@@ -212,8 +212,8 @@ public class MachineFactory{
         for (int k = 0; k < nMachines; k++){
 
             Name = MachineNames[k];
-            float[] inputFlows = StdInputFlowsByMachine[k];
-            float[] outputFlows = StdOutputFlowsByMachine[k];
+            double[] inputFlows = StdInputFlowsByMachine[k];
+            double[] outputFlows = StdOutputFlowsByMachine[k];
 
             try{
 

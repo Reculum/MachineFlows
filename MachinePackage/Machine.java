@@ -10,8 +10,8 @@ public class Machine {
     protected int id;
 
     //std input/output flow amounts of what materials. As a mapping.
-    protected Map<Material, Float> inputAmounts;
-    protected Map<Material, Float> outputAmounts;
+    protected Map<Material, Double> inputAmounts;
+    protected Map<Material, Double> outputAmounts;
 
     //what materials are taken as input and outputted by the machine
     protected Material[] MaterialList;
@@ -23,8 +23,8 @@ public class Machine {
 
     public Machine(int id,
                    Material[] MaterialList,
-                   float[] stdInFlows,
-                   float[] stdOutFlows) throws Exception{
+                   double[] stdInFlows,
+                   double[] stdOutFlows) throws Exception{
 
             if ( (MaterialList.length != stdInFlows.length) ||
                ((MaterialList.length != stdOutFlows.length)) ){
@@ -39,8 +39,8 @@ public class Machine {
             this.MaterialList = MaterialList;
 
             //intialize the two mappings
-            this.inputAmounts = new HashMap<Material, Float>();
-            this.outputAmounts = new HashMap<Material, Float>();
+            this.inputAmounts = new HashMap<Material, Double>();
+            this.outputAmounts = new HashMap<Material, Double>();
             
             int L = MaterialList.length;
 
@@ -48,8 +48,8 @@ public class Machine {
                 
                 Material nextMaterial = MaterialList[k];
 
-                float nextInFlow = stdInFlows[k];
-                float nextOutFlow = stdOutFlows[k];
+                double nextInFlow = stdInFlows[k];
+                double nextOutFlow = stdOutFlows[k];
 
                 inputAmounts.put(nextMaterial, nextInFlow);
                 outputAmounts.put(nextMaterial, nextOutFlow);
@@ -68,8 +68,8 @@ public class Machine {
     }
 
     public int getId(){return id;}
-    public Map<Material, Float> getInputAmounts(){return inputAmounts;}
-    public Map<Material, Float> getOutputAmounts(){return outputAmounts;}
+    public Map<Material, Double> getInputAmounts(){return inputAmounts;}
+    public Map<Material, Double> getOutputAmounts(){return outputAmounts;}
     public Material[] getMaterialList(){return MaterialList;}
     public Map<Material, LinkedList<Machine>> getOutMachinesByMaterial(){return outMachinesByMaterial;}
     public Map<Material, LinkedList<Machine>> getInMachinesByMaterial(){return inMachinesByMaterial;}
