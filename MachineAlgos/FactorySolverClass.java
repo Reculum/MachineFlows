@@ -162,7 +162,7 @@ public class FactorySolverClass{
 		return ConstraintsMatrix;
 	}
 
-	public static PointValuePair ComputeSelfSustainingFlow(MachineFactory f){
+	private static PointValuePair ComputeSelfSustainingFlow(MachineFactory f){
 
 		//compute flow-consistency constraint matrix
 		double[][] flowConsistencyMatrix = ComputeConstraintsMatrix(f);
@@ -221,11 +221,65 @@ public class FactorySolverClass{
 			new NonNegativeConstraint(true)
 		);
 
-		System.out.println("Optimization Successful!");
 		return solution;
 
 
 	}
 
+	public static void ShowStableFactoryFlows(MachineFactory f){
 
+		int nPipes = f.getNumPipes();
+		int nMachines = f.getNumMachines();
+
+
+		Pipe[] PipeList = f.getPipeList();
+		Machine[] MachineList = f.getMachineList();
+		String[] MachineNames = f.getMachineNames();
+
+		PointValuePair sol = ComputeSelfSustainingFlow(f);
+
+
+		String tempPrint = "List of Computed Minimal Flows";
+
+		tempPrint += "|" + "\n";
+        tempPrint += "|" + "\n";
+
+		for (int k = 0; k < nPipes; k++){
+
+			Pipe tmpPipe = PipeList[k];
+
+			String machFromName = MachineNames[tmpPipe.getMachineFrom().getId()];
+			String machToName = MachineNames[tmpPipe.getMachineTo().getId()];
+			String matAcrossName = tmpPipe.getMaterialAcross().getName();
+
+			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + " units of Material: " + matAcrossName + ", need to flow from: " 
+					  + machFromName + ", to: " + machToName;
+
+			tempPrint += "|" + "\n";
+        	tempPrint += "|" + "\n";
+		}
+
+		tempPrint += "|__________________________________";
+
+		System.out.print(tempPrint);
+
+		tempPrint = "List of Computed Machine Jumpstarting Amounts";
+
+		for (int k = nPipes; k < nPipes + nMachines; k++){
+
+			String tmpMachName = MachineNames[MachineList[k].getId()];
+
+
+			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + "amounts of Machine: " + tmpMachName;
+
+			tempPrint += "|" + "\n";
+        	tempPrint += "|" + "\n";
+
+		}
+
+		tempPrint += "|__________________________________";
+
+		System.out.print(tempPrint);
+
+	}
 }
