@@ -14,9 +14,11 @@ public class MachineFactory{
 
     protected Machine[] MachineList;
     protected Material[] MaterialList;
+    protected Pipe[] PipeList;
 
     protected int nMachines;
     protected int nMaterials;
+    protected int nPipes;
 
     protected String[] MachineNames;
     
@@ -114,6 +116,7 @@ public class MachineFactory{
     public int getNumMaterials(){return  nMaterials;}
     public Machine[] getMachineList(){return MachineList;}
     public Material[] getMaterialList(){return  MaterialList;}
+    public Pipe[] getPipeList(){return  PipeList;}
     public String[] getMachineNames(){return MachineNames;}
 
 
@@ -126,6 +129,7 @@ public class MachineFactory{
 
         MaterialList = new Material[nMaterials];
         MachineList = new Machine[nMachines];
+        PipeList = new Pipe[nMachines * nMaterials];
 
         //we will need to order and save important informations in array, in order to effeciently combine
         //them later on
@@ -224,6 +228,8 @@ public class MachineFactory{
         String MachNameFrom;
         String MachNameTo;
         String MatName;
+        int PipeId = 0;
+        nPipes = 0;
 
         try(BufferedReader br = new BufferedReader(new FileReader(PipePath))){    
             
@@ -239,7 +245,12 @@ public class MachineFactory{
                 Machine MachTo = FromMachineNameToMachine.get(MachNameTo);
                 Material Mat = new Material(MatName);
 
-                try{this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat);}
+                try{
+                    this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat); Pipe tempPipe = new Pipe(PipeId, MachFrom, MachTo, Mat);
+                    PipeList[PipeId] = tempPipe;
+                    nPipes += 1;
+                    PipeId += 1;
+                }
                 catch(Exception e){
                     System.out.println("Error while piping a material from a machine!");
                     System.out.println(e.getMessage());
@@ -250,6 +261,14 @@ public class MachineFactory{
         }
         catch (IOException e){
         System.out.println("Error while processing the Pipe file.");
+        }
+
+        //we may have initially allocated more memory that was actually necessary for storing all the pipes.
+        //Since slicing the array would be, in my opinion, quite the slow operation I suggest filling
+        //the remainder of the array with null Pipes instead.
+
+        for (int k = PipeId; k < nMachines * nMaterials; k += 1){
+            PipeList[k] = null;
         }
 
     }
