@@ -16,18 +16,7 @@ public class test {
 
 		System.out.println(t.toString());
 
-		String[] MachineNames = t.getMachineNames();
-
-		Map<Material, Float> ProductionAmounts = new HashMap<Material, Float>();
-		Material epsMaterial = new Material("epsilon");
-		ProductionAmounts.put(epsMaterial, (float) 1.0);
-
-		int[] IntegerAmounts = FactorySolverClass.ComputeMinimalMachineConfig(t, ProductionAmounts);
-
-		for(int k = 0; k < IntegerAmounts.length; k++){
-			
-			System.out.println( MachineNames[k] + ": " + Integer.toString(IntegerAmounts[k]) );
-		}
+		float[][] matr = FactorySolverClass.ComputeConstraintsMatrix(t);
 				
 	}
 	

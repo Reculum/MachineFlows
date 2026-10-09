@@ -117,6 +117,7 @@ public class MachineFactory{
 
     public int getNumMachines(){return nMachines;}
     public int getNumMaterials(){return  nMaterials;}
+    public int getNumPipes(){return  nPipes;}
     public Machine[] getMachineList(){return MachineList;}
     public Material[] getMaterialList(){return  MaterialList;}
     public Pipe[] getPipeList(){return  PipeList;}
