@@ -239,7 +239,7 @@ public class FactorySolverClass{
 		PointValuePair sol = ComputeSelfSustainingFlow(f);
 
 
-		String tempPrint = "List of Computed Minimal Flows";
+		String tempPrint = "List of Computed Minimal Flows" + "\n";
 
 		tempPrint += "|" + "\n";
         tempPrint += "|" + "\n";
@@ -253,31 +253,31 @@ public class FactorySolverClass{
 			String matAcrossName = tmpPipe.getMaterialAcross().getName();
 
 			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + " units of Material: " + matAcrossName + ", need to flow from: " 
-					  + machFromName + ", to: " + machToName;
+					  + machFromName + ", to: " + machToName + "\n";
 
-			tempPrint += "|" + "\n";
         	tempPrint += "|" + "\n";
 		}
 
-		tempPrint += "|__________________________________";
+		tempPrint += "|__________________________________"+ "\n"+ "\n" + "\n"+ "\n";
 
 		System.out.print(tempPrint);
 
-		tempPrint = "List of Computed Machine Jumpstarting Amounts";
+		tempPrint = "List of Computed Machine Jumpstarting Amounts" + "\n";
+
+		tempPrint += "|" + "\n";
+        tempPrint += "|" + "\n";
 
 		for (int k = nPipes; k < nPipes + nMachines; k++){
 
-			String tmpMachName = MachineNames[MachineList[k].getId()];
+			String tmpMachName = MachineNames[MachineList[k - nPipes].getId()];
 
+			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + " amounts of Machine: " + tmpMachName + "\n";
 
-			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + "amounts of Machine: " + tmpMachName;
-
-			tempPrint += "|" + "\n";
         	tempPrint += "|" + "\n";
 
 		}
 
-		tempPrint += "|__________________________________";
+		tempPrint += "|__________________________________" + "\n"+ "\n" + "\n"+ "\n";
 
 		System.out.print(tempPrint);
 

@@ -1,9 +1,6 @@
 
 import MachinePackage.*;
 import MachineAlgos.*;
-import org.apache.commons.math3.optim.PointValuePair;
-
-
 
 public class test {
 
@@ -16,9 +13,7 @@ public class test {
 
 		System.out.println(t.toString());
 
-		PointValuePair sol = FactorySolverClass.ComputeSelfSustainingFlow(t);
-
-		System.out.println(sol);
+		FactorySolverClass.ShowStableFactoryFlows(t);
 
 				
 	}
