@@ -57,7 +57,7 @@ public class FactorySolverClass{
 
 	}
 
-	public static double[][] ComputeConstraintsMatrix(MachineFactory f){
+	private static double[][] ComputeConstraintsMatrix(MachineFactory f){
 
 		int nMachines = f.getNumMachines();
 		int nMaterials = f.getNumMaterials();
@@ -187,6 +187,7 @@ public class FactorySolverClass{
 			Machine factoryOutputMachine = factoryOutputIter.next();
 			int FactoryOutputId = factoryOutputMachine.getId();
 			minimalOutputConstraints[rowId][nPipes + FactoryOutputId] = 1;
+			rowId += 1;
 		}
 
 		//now we need to prepare the constraints

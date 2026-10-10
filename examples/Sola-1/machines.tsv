@@ -1,0 +1,15 @@
+rutDust	carbDust	magDust	magClDust	Cl	CO	ti-4-cl	Ox	hotTi
+sRu	in	0	0	0	0	0	0	0	0	0
+sRu	out	1	0	0	0	0	0	0	0	0
+chemReact	in	1	2	0	0	4000	0	0	0	0
+chemReact	out	0	0	0	0	0	2000	1000	0	0
+elect1	in	0	0	0	0	0	1000	0	0	0
+elect1	out	0	1	0	0	0	0	0	1000	0
+blastForn	in	0	0	2	0	0	0	1000	0	0
+blastForn	out	0	0	0	6	0	0	0	0	1
+elect2	in	0	0	0	3	0	0	0	0	0
+elect2	out	0	0	1	0	2000	0	0	0	0
+oxOut	in	0	0	0	0	0	0	0	1	0
+oxOut	out	0	0	0	0	0	0	0	0	0
+hotTiOut	in	0	0	0	0	0	0	0	0	1
+hotTiOut	out	0	0	0	0	0	0	0	0	0

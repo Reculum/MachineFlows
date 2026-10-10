@@ -1,0 +1,9 @@
+sRu	chemReact	rutDust
+chemReact	elect1	CO
+chemReact	blastForn	ti-4-cl
+elect1	chemReact	carbDust
+elect1	oxOut	Ox
+blastForn	elect2	magClDust
+blastForn	hotTiOut	hotTi
+elect2	chemReact	Cl
+elect2	blastForn	magDust

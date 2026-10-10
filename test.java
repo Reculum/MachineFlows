@@ -6,10 +6,10 @@ public class test {
 
 	public static void main(String[] args) {
 
-		String path = "./examples/Factory-2/";
+		String path = "./examples/Sola-1/";
 
 		MachineFactory t = new MachineFactory();
-		t.buildFactoryFromFile(path + "machines.txt", path + "plumbing.txt");
+		t.buildFactoryFromFile(path + "machines.tsv", path + "plumbing.tsv");
 
 		System.out.println(t.toString());
 

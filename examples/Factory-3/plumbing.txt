@@ -1,0 +1,8 @@
+m1	m2	beta
+m1	m3	beta
+m1	m4	beta
+m2	m1	alfa
+m2	o1	gamma
+m3	o1	gamma
+m4	m1	delta
+m4	o1	gamma
