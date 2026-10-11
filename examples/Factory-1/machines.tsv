@@ -1,4 +1,4 @@
-alpha	beta	gamma	delta
+		alpha	beta	gamma	delta
 s1	in	0	0	0	0
 s1	out	1	1	0	0
 s2	in	0	0	0	0
@@ -10,4 +10,4 @@ m2	out	0	0	0	2
 m3	in	0	0	1	0
 m3	out	0	0	0	1
 o1	in	0	0	0	1
-o1	out	0	0	0	1
+o1	out	0	0	0	0
