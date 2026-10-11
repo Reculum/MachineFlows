@@ -1,4 +1,4 @@
-rutDust	carbDust	magDust	magClDust	Cl	CO	ti-4-cl	Ox	hotTi
+		rutDust	carbDust	magDust	magClDust	Cl	CO	ti-4-cl	Ox	hotTi
 sRu	in	0	0	0	0	0	0	0	0	0
 sRu	out	1	0	0	0	0	0	0	0	0
 chemReact	in	1	2	0	0	4000	0	0	0	0

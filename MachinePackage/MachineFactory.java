@@ -46,6 +46,8 @@ public class MachineFactory{
                 CurrentChar = line.charAt(k);                
                 if ( (CurrentChar == '\t') || (k + 1 == LenLine)){nMaterials += 1;}
             }
+            //again, for easier file.tsv alignment we expect two extra 'ghost' materials
+            nMaterials -= 2;
 
             //now, read all the other lines until there are no more
             while ( (line = br.readLine()) != null) {
@@ -77,9 +79,9 @@ public class MachineFactory{
         String[] Materials = MaterialLine.split("\t");
         int nMaterials = Materials.length;
 
-        for (int k = 0; k < nMaterials; k++){
-
-            Material tempMaterial = new Material(Materials[k]);
+        for (int k = 0; k < nMaterials - 2; k++){
+            //+2 for easier file.tsv allignment
+            Material tempMaterial = new Material(Materials[k + 2]);
             MaterialList[k] = tempMaterial;
             FromMaterialToInt.put(tempMaterial, k);
 
@@ -167,7 +169,7 @@ public class MachineFactory{
         try(BufferedReader br = new BufferedReader(new FileReader(MachinePath))){
             
             String FirstLine = br.readLine();
-            this.ParseMaterialLine(FirstLine);
+            ParseMaterialLine(FirstLine);
 
             //now we read the remaining lines
 
