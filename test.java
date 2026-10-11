@@ -9,7 +9,9 @@ public class test {
 		String path = "./examples/Sola-1/";
 
 		MachineFactory t = new MachineFactory();
-		t.buildFactoryFromFile(path + "machines.tsv", path + "plumbing.tsv");
+
+		try{t.buildFactoryFromFile(path + "machines.tsv", path + "plumbing.tsv");}
+		catch(Exception e){System.out.println(e.getMessage());}
 
 		System.out.println(t.toString());
 

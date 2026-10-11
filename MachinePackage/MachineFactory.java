@@ -128,9 +128,9 @@ public class MachineFactory{
     public int GetMaterialId(Material mat){return FromMaterialToInt.get(mat);}
 
 
-    public void buildFactoryFromFile(String MachinePath, String PipePath){
+    public void buildFactoryFromFile(String MachinePath, String PipePath) throws Exception{
 
-        int nMachnMat[] = this.ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
+        int nMachnMat[] = ParseMachinelFileIntoTotalMachinesAndMaterials(MachinePath);
 
         nMachines = nMachnMat[0];
         nMaterials = nMachnMat[1];
@@ -207,7 +207,8 @@ public class MachineFactory{
 
         br.close();
 
-        } catch(Exception e) {System.out.println("Error in reading the Machine Flows");}
+        } catch(Exception e) {System.out.println("Error in reading the Machine Flows"); System.out.println(e.getMessage());
+		}
 
         //now, we build and associate the machines to their names
 
@@ -254,7 +255,7 @@ public class MachineFactory{
                 Material Mat = new Material(MatName);
 
                 try{
-                    this.PipeMaterialBetweenMachines(MachFrom, MachTo, Mat); Pipe tempPipe = new Pipe(PipeId, MachFrom, MachTo, Mat);
+                    PipeMaterialBetweenMachines(MachFrom, MachTo, Mat); Pipe tempPipe = new Pipe(PipeId, MachFrom, MachTo, Mat);
                     PipeList[PipeId] = tempPipe;
                     nPipes += 1;
                     PipeId += 1;
@@ -268,7 +269,7 @@ public class MachineFactory{
             br.close();
         }
         catch (IOException e){
-        System.out.println("Error while processing the Pipe file.");
+        System.out.println("Error while processing the Pipe file."); System.out.println(e.getMessage());
         }
 
         //we may have initially allocated more memory that was actually necessary for storing all the pipes.
@@ -279,6 +280,43 @@ public class MachineFactory{
             PipeList[k] = null;
         }
 
+		//now, one final step is needed: we need to make sure that every machine has all its input convered.
+		//Therefore, we should iterate over the machines and check whether the list of inputting ones
+		//is non-empty for all non-negative input amounts
+
+		boolean FactoryIsValid = true;
+		int idxMachine = 0;
+		int idxMaterial = 0;
+
+		while ( (idxMachine < nMachines) && (FactoryIsValid)){
+
+			Machine tempMachine = MachineList[idxMachine];
+			Map<Material, LinkedList<Machine>> inputMachines = tempMachine.getInMachinesByMaterial();
+			Map<Material, Double> inputAmounts = tempMachine.getInputAmounts();
+			idxMaterial = 0;
+
+			while ( (idxMaterial < nMaterials) && (FactoryIsValid)){
+
+				Material tempMaterial = MaterialList[idxMaterial];
+
+				if ( (inputAmounts.get(tempMaterial) > 0) && (inputMachines.get(tempMaterial).size() == 0)){
+					FactoryIsValid = false;
+				}
+				else{
+					idxMaterial += 1;
+				}				
+			}
+			
+			if (FactoryIsValid){
+				idxMachine += 1;
+			}
+			
+		}
+
+		if (!FactoryIsValid){
+			throw new Exception("CRITICAL ERROR: machine's " + MachineNames[idxMachine] + " need for material " + MaterialList[idxMaterial].getName() +
+								" is NOT properly satisfied, check the machine file and try again!");
+		}
     }
     
     @Override 
