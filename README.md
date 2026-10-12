@@ -21,7 +21,7 @@ The package then constructs a system of linear constraints describing the materi
 
 A linear programming solver searches for a feasible configuration that minimizes the sum of the material flows through the pipes. The resulting solution specifies the quantities associated with each pipe and the machine-cycle multipliers needed to satisfy the modeled production constraints.
 
-Output
+Output:
 
 For a feasible factory, MachineFlows reports:
 
@@ -31,20 +31,19 @@ For a feasible factory, MachineFlows reports:
 
 These quantities provide a candidate jumpstarting configuration for the factory.
 
-Mathematical Model
-
+Mathematical Model:
 MachineFlows uses linear programming to solve a material-allocation problem.
 
 The current formulation uses:
 
-Linear constraints derived from machine input and output requirements.
-Nonnegative decision variables for pipe flows and machine-cycle multipliers.
-A normalization condition for factory-output machines.
-An objective function minimizing total pipe flow.
+* Linear constraints derived from machine input and output requirements.
+* Nonnegative decision variables for pipe flows and machine-cycle multipliers.
+* A normalization condition for factory-output machines.
+* An objective function minimizing total pipe flow.
 
 The solver is implemented in Java using Apache Commons Math.
 
-Scope and Limitations
+Scope and Limitations:
 
 MachineFlows models material quantities and machine input/output relationships. It does not simulate the temporal execution of machines or model the detailed mechanics of material transfers.
 
@@ -52,13 +51,12 @@ Its results therefore concern feasibility within the specified mathematical mode
 
 Integer scaling of machine-cycle multipliers is a separate consideration when a factory requires discrete machine counts or indivisible material quantities.
 
-Project Status
-
+Project Status:
 MachineFlows is an ongoing project. The current implementation focuses on linear programming for factory material allocation, with further work planned on validation and integer-compatible configurations.
 
-Dependencies
-Java
-Apache Commons Math
-License
+Dependencies:
+* Java
+*Apache Commons Math
 
+License:
 See the repository's license file for the applicable terms.
