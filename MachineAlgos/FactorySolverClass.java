@@ -22,7 +22,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 
 public class FactorySolverClass{
 
-	public FactorySolverClass(){}
+	public FactorySolverClass(){}	
 
 	private static LinkedList<Machine> LocateFactoryOutputs(MachineFactory Factory){
 
