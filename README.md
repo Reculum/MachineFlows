@@ -4,13 +4,14 @@ MachineFlows is a Java package for determining whether a GregTech factory can be
 
 Given a description of the machines in a factory and their connections, MachineFlows formulates a linear optimization problem to determine how much material must flow through each pipe and how much work each machine must perform to sustain the production circuit.
 
-Features
-Factory modeling: Describe machines, their material inputs and outputs, and the pipes connecting them.
-Jumpstart feasibility: Determine whether the factory's material-balance constraints admit a feasible solution.
-Material-flow calculation: Compute the amount of each material that must travel through each pipe.
-Jumpstarting requirements: Calculate the machine-cycle multipliers associated with the resulting material allocation.
-Flow optimization: Minimize the total flow across the factory's pipes to select a particular feasible configuration.
-How It Works
+Features:
+* Factory modeling: Describe machines, their material inputs and outputs, and the pipes connecting them;
+* Jumpstart feasibility: Determine whether the factory's material-balance constraints admit a feasible solution;
+* Material-flow calculation: Compute the amount of each material that must travel through each pipe;
+* Jumpstarting requirements: Calculate the machine-cycle multipliers associated with the resulting material allocation;
+* Flow optimization: Minimize the total flow across the factory's pipes to select a particular feasible configuration;
+
+How It Works:
 
 MachineFlows represents a factory as a network of machines connected by material-carrying pipes.
 
@@ -24,9 +25,9 @@ Output
 
 For a feasible factory, MachineFlows reports:
 
-The material that must travel through each pipe.
-The quantity of material to be transferred through that pipe.
-The machine-cycle multipliers associated with the computed configuration.
+* The material that must travel through each pipe.
+* The quantity of material to be transferred through that pipe.
+* The machine-cycle multipliers associated with the computed configuration.
 
 These quantities provide a candidate jumpstarting configuration for the factory.
 
