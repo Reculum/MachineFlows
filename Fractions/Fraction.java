@@ -7,10 +7,8 @@ public class Fraction{
 
 		public Fraction(int num, int den){
 
-			int m = ComputeMCD(num, den);
-
-			this.n = num / m;
-			this.d = den / m;
+			this.n = num;
+			this.d = den;			
 		}
 
 		public int getNum(){return this.n;}
@@ -22,6 +20,16 @@ public class Fraction{
 			int newDen = this.d * f2.getDen();
 
 			return ( new Fraction(newNum, newDen) );
+		}
+
+		public void reduce(){
+			int num = getNum();
+			int den = getDen();
+
+			int m = ComputeMCD(num, den);
+
+			this.n = num / m;
+			this.d = den / m;
 		}
 
 		private static int ComputeMCD(int a, int b){
@@ -85,9 +93,77 @@ public class Fraction{
 
 		}
 
-		return predictedPeriod;
+		char[] adaptedPredictedPeriod = new char[predictedLength];
+
+		for (int j = 0; j < predictedLength; j++){
+			adaptedPredictedPeriod[j] = predictedPeriod[j];
+		}
+
+
+		return adaptedPredictedPeriod;
 
 	}
 		
-	
+
+		public static Fraction doubleToFraction(double x){
+
+			//first, convert into string
+
+			String xString = Double.toString(x);
+
+			//then split the decimals
+
+			String[] periodSplit = xString.split("\\.");
+
+			//first, we process the integral part
+			String intString = periodSplit[0];
+			int integralPart = Integer.parseInt(intString);
+
+			//then the tricky decimal one
+			String decString = periodSplit[1];
+
+			//remove the last char to avoid it messing up the period calculation
+			decString = decString.substring(0, decString.length() - 1);
+
+			char[] periodChars = FindStringPeriod(decString);
+			int periodLength = periodChars.length;
+
+			String suffNines = "";
+
+			for (int k = 0; k < periodLength; k++){
+				suffNines += "9";
+			}
+
+			int ninesDenom = Integer.parseInt(suffNines);
+			int iterNum = 1;
+			int periodNumerator = 0;		
+
+			for (int k = periodLength - 1; k >= 0; k--){
+
+				char valueChar = periodChars[k];
+				int intValue = valueChar - '0';
+
+				periodNumerator += iterNum * intValue;
+				iterNum *= 10;				
+
+			}
+
+			Fraction periodFraction = new Fraction(periodNumerator, ninesDenom);
+			//avoid overflowing errors
+			periodFraction.reduce();
+			
+			Fraction integralFraction = new Fraction(integralPart, 1);
+
+			Fraction retFraction = integralFraction.add(periodFraction);
+			retFraction.reduce();
+
+			return retFraction;
+
+		}
+
+		@Override 
+		public String toString(){
+			return Integer.toString(n) + " / " + Integer.toString(d);
+		}
+
 	}
