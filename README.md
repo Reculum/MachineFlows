@@ -56,7 +56,7 @@ MachineFlows is an ongoing project. The current implementation focuses on linear
 
 Dependencies:
 * Java
-*Apache Commons Math
+* Apache Commons Math
 
 License:
 See the repository's license file for the applicable terms.
