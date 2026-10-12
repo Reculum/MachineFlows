@@ -5,7 +5,7 @@ public class periodFinding {
 
 	public static void main(String[] args) {
 
-		double x = 0.1666666666666666;
+		double x = 10.0/6;
 
 		Fraction xFrac = Fraction.doubleToFraction(x);
 

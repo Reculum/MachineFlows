@@ -114,7 +114,7 @@ public class Fraction{
 			//the precision digit is just floting point garbage
 
 			BigDecimal xBD = BigDecimal.valueOf(x);
-			xBD = xBD.setScale(15, RoundingMode.DOWN);
+			xBD = xBD.setScale(13, RoundingMode.DOWN);
 
 			x = xBD.doubleValue();
 
