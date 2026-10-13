@@ -17,6 +17,7 @@ public class Fraction{
 		public long getNum(){return this.n;}
 		public long getDen(){return this.d;}
 
+		public void setNum(long x){this.n = x;}
 		public void setDen(long x){this.d = x;}
 
 		public Fraction add(Fraction f2){
@@ -195,6 +196,9 @@ public class Fraction{
 		}
 		public static Fraction doubleToFraction(double x){
 
+			int sign = (int) Math.signum(x);
+			x = Math.abs(x);
+
 			//once again, we need to introdce another cutoff for precision. In this case, we assume that anything beyond
 			//the precision digit is just floting point garbage
 
@@ -239,6 +243,7 @@ public class Fraction{
 				returnFraction = returnFraction.add(integralFraction);
 				returnFraction.reduce();
 
+				returnFraction.setNum(returnFraction.getNum() * sign);
 				return returnFraction;
 			}
 
@@ -255,12 +260,13 @@ public class Fraction{
 			int prefixLength = prefix.length();
 			periodFraction.setDen(periodFraction.getDen() * Math.powExact(10, prefixLength));
 
-			Fraction retFraction = periodFraction.add(prefixFraction);
-			retFraction.reduce();
-			retFraction = retFraction.add(integralFraction);
-			retFraction.reduce();
+			Fraction returnFraction = periodFraction.add(prefixFraction);
+			returnFraction.reduce();
+			returnFraction = returnFraction.add(integralFraction);
+			returnFraction.reduce();
 
-			return retFraction;
+			returnFraction.setNum(returnFraction.getNum() * sign);
+			return returnFraction;
 		}
 
 		@Override 
