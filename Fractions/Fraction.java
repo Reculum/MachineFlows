@@ -17,6 +17,8 @@ public class Fraction{
 		public long getNum(){return this.n;}
 		public long getDen(){return this.d;}
 
+		public void setDen(long x){this.d = x;}
+
 		public Fraction add(Fraction f2){
 			
 			long newNum = this.n * f2.getDen() + f2.getNum() * this.d;
@@ -31,11 +33,17 @@ public class Fraction{
 
 			long m = ComputeMCD(num, den);
 
-			this.n = num / m;
-			this.d = den / m;
+			if (m != 0){
+				this.n = num / m;
+				this.d = den / m;
+			}
+			
 		}
 
 		private static long ComputeMCD(long a, long b){
+
+			if ( (a == 0) && (b != 0) ){return b;}
+			if ( (b == 0) && (a != 0) ){return a;}
 
 			long x;
 			long y;
@@ -53,7 +61,7 @@ public class Fraction{
 
 		}
 
-		private static char[] FindStringPeriod(String s){
+		private static String FindStringPeriod(String s){
 
 			int stringLength = s.length();
 			char[] stringChars = new char[stringLength];
@@ -103,11 +111,88 @@ public class Fraction{
 			}
 
 
-			return adaptedPredictedPeriod;
+			return String.valueOf(adaptedPredictedPeriod);
 
 		}
 		
+		private static String[] FindPeriodAndPrefix(String decString){
 
+			String prefix = "";
+			String period = "";
+			boolean foundPeriod = false;
+
+			for (int k = 0; (k < decString.length()) && !(foundPeriod); k++){
+
+				String s = decString.substring(k);
+				String candidatePeriod = FindStringPeriod(s);
+
+				if (s.length() == candidatePeriod.length()){
+					prefix += decString.charAt(k);
+				}
+				else{
+					period = candidatePeriod;
+					foundPeriod = true;
+				}
+			}
+
+			String[] ret = {prefix, period};
+			return ret;
+		}
+
+
+		private static Fraction PeriodicStringToFraction(String decString){
+
+			String periodChars = FindStringPeriod(decString);
+			int periodLength = periodChars.length();
+
+			if (periodLength == 0){return new Fraction(0, 1);}
+
+			String suffNines = "";
+
+			for (int k = 0; k < periodLength; k++){
+				suffNines += "9";
+			}
+
+			long ninesDenom = Long.parseLong(suffNines);
+			long iterNum = 1;
+			long periodNumerator = 0;		
+
+			for (int k = periodLength - 1; k >= 0; k--){
+
+				char valueChar = periodChars.charAt(k);
+				int intValue = valueChar - '0';
+
+				periodNumerator += iterNum * intValue;
+				iterNum *= 10;				
+
+			}
+
+			Fraction periodFraction = new Fraction(periodNumerator, ninesDenom);
+			periodFraction.reduce();
+
+			return periodFraction;			
+
+		}
+
+		private static Fraction PrefixStringToFraction(String prefixString){
+
+			int prefixLength = prefixString.length();
+
+			if (prefixLength == 0){return new Fraction(0, 1);}
+
+			String suffTens = "1";
+
+			for (int k = 0; k < prefixLength; k++){
+				suffTens += "0";
+			}
+
+			long TensDenom = Long.parseLong(suffTens);
+			long prefixNum = Long.parseLong(prefixString);
+
+			Fraction prefixFraction = new Fraction(prefixNum, TensDenom);
+			prefixFraction.reduce();
+			return prefixFraction;
+		}
 		public static Fraction doubleToFraction(double x){
 
 			//once again, we need to introdce another cutoff for precision. In this case, we assume that anything beyond
@@ -159,37 +244,23 @@ public class Fraction{
 
 			//if we didn't return yet, we can now compute the approximating fraction (given periodic decimals)
 
-			char[] periodChars = FindStringPeriod(decString);
-			int periodLength = periodChars.length;
+			String[] prefixAndPeriod = FindPeriodAndPrefix(decString);
 
-			String suffNines = "";
+			String prefix = prefixAndPeriod[0];
+			String period = prefixAndPeriod[1];
 
-			for (int k = 0; k < periodLength; k++){
-				suffNines += "9";
-			}
+			Fraction periodFraction = PeriodicStringToFraction(period);
+			Fraction prefixFraction = PrefixStringToFraction(prefix);
 
-			long ninesDenom = Long.parseLong(suffNines);
-			long iterNum = 1;
-			long periodNumerator = 0;		
+			int prefixLength = prefix.length();
+			periodFraction.setDen(periodFraction.getDen() * Math.powExact(10, prefixLength));
 
-			for (int k = periodLength - 1; k >= 0; k--){
-
-				char valueChar = periodChars[k];
-				int intValue = valueChar - '0';
-
-				periodNumerator += iterNum * intValue;
-				iterNum *= 10;				
-
-			}
-
-			Fraction periodFraction = new Fraction(periodNumerator, ninesDenom);
-			//avoid overflowing errors
-			periodFraction.reduce();
-			Fraction retFraction = integralFraction.add(periodFraction);
+			Fraction retFraction = periodFraction.add(prefixFraction);
+			retFraction.reduce();
+			retFraction = retFraction.add(integralFraction);
 			retFraction.reduce();
 
 			return retFraction;
-
 		}
 
 		@Override 
