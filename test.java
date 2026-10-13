@@ -6,7 +6,7 @@ public class test {
 
 	public static void main(String[] args) {
 
-		String path = "./examples/Sola-1/";
+		String path = "./examples/Factory-1/";
 
 		MachineFactory t = new MachineFactory();
 

@@ -1,6 +1,7 @@
 
 package MachineAlgos;
 import MachinePackage.*;
+import Fractions.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -253,7 +254,9 @@ public class FactorySolverClass{
 			String machToName = MachineNames[tmpPipe.getMachineTo().getId()];
 			String matAcrossName = tmpPipe.getMaterialAcross().getName();
 
-			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + " units of Material: " + matAcrossName + ", need to flow from: " 
+			Fraction tempFraction = Fraction.doubleToFraction(sol.getPoint()[k]);
+
+			tempPrint += "|____" + "\t" + tempFraction.toString() + " units of Material: " + matAcrossName + ", need to flow from: " 
 					  + machFromName + ", to: " + machToName + "\n";
 
         	tempPrint += "|" + "\n";
@@ -272,7 +275,9 @@ public class FactorySolverClass{
 
 			String tmpMachName = MachineNames[MachineList[k - nPipes].getId()];
 
-			tempPrint += "|____" + "\t" + Double.toString(sol.getPoint()[k]) + " amounts of Machine: " + tmpMachName + "\n";
+			Fraction tempFraction = Fraction.doubleToFraction(sol.getPoint()[k]);
+
+			tempPrint += "|____" + "\t" + tempFraction.toString() + " amounts of Machine: " + tmpMachName + "\n";
 
         	tempPrint += "|" + "\n";
 
