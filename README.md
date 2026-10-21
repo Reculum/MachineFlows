@@ -1,15 +1,15 @@
 # MachineFlows
 
-**MachineFlows** is a Java package designed to determine whether a GregTech factory can be jumpstarted and to find a material-flow configuration that satisfies its production requirements[cite: 1].
+**MachineFlows** is a Java package designed to determine whether a GregTech factory can be jumpstarted and to find a material-flow configuration that satisfies its production requirements.
 
-Given a description of the machines in a factory and their connections, MachineFlows formulates a linear optimization problem to determine how much material must flow through each pipe and how much work each machine must perform to sustain the production circuit[cite: 1].
+Given a description of the machines in a factory and their connections, MachineFlows formulates a linear optimization problem to determine how much material must flow through each pipe and how much work each machine must perform to sustain the production circuit.
 
 ---
 
 ## Features
 
 * **Factory Modeling:** Describe machines, their material inputs and outputs, and the pipes connecting them.
-* **Jumpstart Feasibility:** Determine whether the factory's material-balance constraints admit a feasible solution[cite: 1].
+* **Jumpstart Feasibility:** Determine whether the factory's material-balance constraints admit a feasible solution.
 * **Material-Flow Calculation:** Compute the amount of each material that must travel through each pipe.
 * **Jumpstarting Requirements:** Calculate the machine-cycle multipliers associated with the resulting material allocation.
 * **Flow Optimization:** Minimize the total flow across the factory's pipes to select a particular feasible configuration.
@@ -37,7 +37,7 @@ For a feasible factory, MachineFlows reports:
 
 MachineFlows uses linear programming to solve a material-allocation problem utilizing:
 * Linear constraints derived from machine input and output requirements.
-* Nonnegative decision variables for pipe flows and machine-cycle multipliers[cite: 1].
+* Nonnegative decision variables for pipe flows and machine-cycle multipliers.
 * A factory-output condition for the whole circuit.
 * An objective function minimizing total pipe flow.
 
